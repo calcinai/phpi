@@ -1,0 +1,24 @@
+{
+  "name": "calcinai/php-rpi",
+  "description": "Event driven bindings for the Raspberry Pi GPIO",
+  "type": "Library",
+  "require": {
+    "react/event-loop": "^0.4.1",
+    "mkraemer/react-inotify": "1.1.0"
+  },
+  "suggest": {
+    "ext-inotify": "*"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Calcinai",
+      "email": "michael@calcin.ai"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Calcinai\\PHPRPi\\": "src/PHPRPi"
+    }
+  }
+}
