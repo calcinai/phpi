@@ -13,14 +13,17 @@ use React\EventLoop\LoopInterface;
 
 class Factory {
 
+    /**
+     * @param LoopInterface $loop
+     * @return Board\AbstractBoard
+     * @throws UnsupportedBoardException
+     */
     public static function create(LoopInterface $loop) {
 
         list($board, $serial) = self::identifyBoard();
 
         /** @var Board\AbstractBoard $board */
-
         return new $board($loop, $serial);
-
     }
 
 

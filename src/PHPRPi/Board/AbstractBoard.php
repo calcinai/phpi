@@ -7,6 +7,7 @@
 
 namespace Calcinai\PHPRPi\Board;
 
+use Calcinai\PHPRPi\Pin;
 use React\EventLoop\LoopInterface;
 
 abstract class AbstractBoard {
@@ -18,12 +19,25 @@ abstract class AbstractBoard {
 
     private $serial;
 
+    /**
+     * @var Pin[] $pins
+     */
+    private $pins = [];
+
     public function __construct(LoopInterface $loop, $serial = null) {
         $this->loop = $loop;
         $this->serial = $serial;
+    }
 
-        //fopen('mmap:///dev/zero:65536');
+    /**
+     * @param $pin_number
+     * @return Pin
+     */
+    public function getPin($pin_number){
+        $pin = new Pin($this, $pin_number);
+        $this->pins[$pin_number] = $pin;
 
+        return $pin;
     }
 
 

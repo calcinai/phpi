@@ -7,7 +7,9 @@ $loop = \React\EventLoop\Factory::create();
 
 $rpi = \Calcinai\PHPRPi\Factory::create($loop);
 
-//print_r($rpi);
+$pin = $rpi->getPin(4);
 
+
+print_r($rpi);
 
 $loop->run();

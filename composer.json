@@ -11,7 +11,7 @@
   ],
   "require": {
     "react/event-loop": "^0.4.1",
-    "calcinai/rubberneck": "^0.1"
+    "react/child-process": "^0.4.0"
   },
   "autoload": {
     "psr-4": {
