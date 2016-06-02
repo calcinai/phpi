@@ -1,15 +1,13 @@
 <?php
 
-use Calcinai\PHPRPi\RPi;
 
 include __DIR__.'/../vendor/autoload.php';
 
+$loop = \React\EventLoop\Factory::create();
 
-$rpi = new RPi();
+$rpi = \Calcinai\PHPRPi\Factory::create($loop);
 
-print_r($rpi);
-
-inotify_init();
+//print_r($rpi);
 
 
-$rpi->getLoop()->run();
+$loop->run();
