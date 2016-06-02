@@ -13,13 +13,13 @@ os.close(fd)
 
 
 while True:
-	buffer = sys.stdin.read(6)
-	command = buffer[0]
-	address = struct.unpack('b', buffer[1])[0]
+    buffer = sys.stdin.read(6)
+    command = buffer[0]
+    address = struct.unpack('b', buffer[1])[0]
 
-	mem.seek(address)
-	
-	if(command == 'r'):
-		sys.stdout.write(mem.read(4))
-	elif(command == 'w'):
-		mem.write(buffer[2:])
+    mem.seek(address)
+    
+    if(command == 'r'):
+        sys.stdout.write(mem.read(4))
+    elif(command == 'w'):
+        mem.write(buffer[2:])
