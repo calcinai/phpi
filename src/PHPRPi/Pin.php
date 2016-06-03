@@ -10,14 +10,39 @@ use Calcinai\PHPRPi\Board\AbstractBoard;
 
 class Pin {
 
-    const
-
     /**
      * @var AbstractBoard $board
      */
     private $board;
 
-    public function __construct(AbstractBoard $board) {
+    /**
+     * @var int BCM pin number
+     */
+    private $pin_number;
+
+    /**
+     * @var int function select
+     */
+    private $function;
+
+    public function __construct(AbstractBoard $board, $pin_number) {
         $this->board = $board;
+        $this->pin_number = $pin_number;
+    }
+
+    public function setFunction($function) {
+
+        if(is_int($function)){
+            //0 <= $function <= 7
+            $this->function = $function;
+        } else {
+            //Parse from matrix
+        }
+
+
+    }
+
+    public function getFunction() {
+        return $this->function;
     }
 }

@@ -34,11 +34,15 @@ abstract class AbstractBoard {
      * @return Pin
      */
     public function getPin($pin_number){
-        $pin = new Pin($this, $pin_number);
-        $this->pins[$pin_number] = $pin;
 
-        return $pin;
+        if(!isset($this->pins[$pin_number])){
+            $pin = new Pin($this, $pin_number);
+            $this->pins[$pin_number] = $pin;
+        }
+
+        return $this->pins[$pin_number];
     }
 
+    abstract public function getPinMatrix();
 
 }

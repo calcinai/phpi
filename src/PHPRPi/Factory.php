@@ -34,12 +34,12 @@ class Factory {
     private static function identifyBoard() {
 
         $mock_board_tuple = [Board\Mock::class, null];
+        $cpuinfo_file = '/proc/cpuinfo';
 
-        if(!file_exists('/proc/cpuinfo')){
+        if(!file_exists($cpuinfo_file)){
             return $mock_board_tuple;
         }
 
-        $cpuinfo_file = '/proc/cpuinfo';
         $cpuinfo_pattern = '/Hardware\s+:\s(?<soc>.+)\nRevision\s+:\s(?<revision>.+)\nSerial\s+:\s(?<serial>.+)/';
 
         if(!file_exists($cpuinfo_file) || !preg_match($cpuinfo_pattern, file_get_contents($cpuinfo_file), $matches)){
