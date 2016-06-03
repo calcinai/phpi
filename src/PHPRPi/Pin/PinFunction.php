@@ -4,6 +4,9 @@
  * @package    michael
  * @author     Michael Calcinai <michael@calcin.ai>
  */
+
+namespace Calcinai\PHPRPi\Pin;
+
 class PinFunction {
 
     /**
@@ -114,7 +117,7 @@ class PinFunction {
     const RXD1 = 'RXD1';
 
     /** UART 1; Clear To Send */
-    const CTS = 'CTS';
+    const CTS1 = 'CTS1';
 
     /** UART 1 Request To Send */
     const RTS1 = 'RTS1';

@@ -43,6 +43,8 @@ abstract class AbstractBoard {
         return $this->pins[$pin_number];
     }
 
-    abstract public function getPinMatrix();
+    protected static function getPinMatrix(){
+        return [];
+    }
 
 }

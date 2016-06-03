@@ -12,7 +12,8 @@ This library interacts (almost) directly with the peripheral registers for maxim
 
 ## GPIO
 
-GPIO is available as the default function of the pin objects. Alternate functions can be accessed by using the ```setFunction()``` method.  
+GPIO is available as the default function of the pin objects. Alternate functions can be accessed by using the ```setFunction()``` method.  It is
+ recommended to use the function names as opposed to `ALT0..5` unless you know exactly what you're doing.
 A few useful classes are included for digital interaction.
 
 

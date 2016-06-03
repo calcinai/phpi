@@ -13,5 +13,6 @@ use Calcinai\PHPRPi\Board\Feature;
 class B extends AbstractBoard {
 
     use Feature\SoC\BCM2836;
-
+    use Feature\HDMI;
+    use Feature\Ethernet;
 }

@@ -13,5 +13,6 @@ use Calcinai\PHPRPi\Board\Feature;
 class APlus extends AbstractBoard {
 
     use Feature\SoC\BCM2835;
+    use Feature\HDMI;
 
 }
