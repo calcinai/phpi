@@ -7,7 +7,7 @@
 
 namespace Calcinai\PHPRPi\Pin;
 
-class PinFunction {
+class Mode {
 
     /**
      * Binary function selectors.  Each pin has 3 bits.  4 registers total.
