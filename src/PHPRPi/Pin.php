@@ -51,17 +51,14 @@ class Pin {
         return $this->mode;
     }
 
-    public function isOutput(){
-    }
-
-
     public function high(){
         $this->assertMode([Mode::OUTPUT]);
+        $this->board->getGPIORegister()->setPin($this);
     }
 
     public function low(){
         $this->assertMode([Mode::OUTPUT]);
-
+        $this->board->getGPIORegister()->clearPin($this);
     }
 
 
@@ -76,8 +73,22 @@ class Pin {
         return true;
     }
 
+    /**
+     * @param int $bit_multiple
+     * @param int $bits_in_bank
+     * @return int
+     */
+    public function getBank($bit_multiple = 1, $bits_in_bank = 32){
+        return (int) floor($this->pin_number * $bit_multiple / $bits_in_bank);
+    }
 
+    public function getPinBit(){
+        return 1 << ($this->pin_number % 32);
+    }
 
+    public function getPinNumber() {
+        return $this->pin_number;
+    }
 
 
 }

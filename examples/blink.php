@@ -9,7 +9,23 @@ $rpi = \Calcinai\PHPRPi\Factory::create($loop);
 $pin = $rpi->getPin(4);
 $pin->setMode(\Calcinai\PHPRPi\Pin\Mode::OUTPUT);
 
-$pin->high();
+$count = 0;
+
+$loop->addPeriodicTimer($time = 0.0001, function() use($loop, $pin, $time, &$count){
+    $pin->high();
+
+    $loop->addTimer($time / 2, function() use($pin, &$count){
+       $pin->low();
+        $count++;
+    });
+
+});
+
+
+$loop->addPeriodicTimer($time = 1, function() use(&$count){
+    echo $count."\n";
+    $count = 0;
+});
 
 //print_r($pin);
 
@@ -39,10 +55,7 @@ $pin->high();
 //
 //});
 //
-//$loop->addPeriodicTimer($time = 1, function() use($process, $loop, &$count){
-//    echo $count."\n";
-//    $count = 0;
-//});
+
 //
 //$process->stdout->on('data', function($data) {
 //    echo 'data:';

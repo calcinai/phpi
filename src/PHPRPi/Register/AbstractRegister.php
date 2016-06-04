@@ -6,14 +6,17 @@
 
 namespace Calcinai\PHPRPi\Register;
 
+use Calcinai\PHPRPi\Board\AbstractBoard;
+
 abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
     const MMAP_BLOCK_SIZE = 1024;
 
     private $mmap;
 
-    public function __construct($peri_base) {
-        $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $peri_base + static::getOffset());
+    public function __construct(AbstractBoard $board) {
+        $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
+        //Should there be a 'register backup' in here that gets replayed on destruct?
     }
 
 

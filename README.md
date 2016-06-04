@@ -1,15 +1,15 @@
 # php-rpi
 
-*INCOMPLETE WIP - check back later. If you'd like to help send me a message!*
+**INCOMPLETE WIP - check back later. If you'd like to help send me a message!**
 
-Event driven bindings for the Raspberry Pi GPIO
+Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2B, 3B, Compute Module and Pi Zero.
 
 This library interacts (almost) directly with the peripheral registers for maximum functionality and speed.  See note on `mmap/dma`
 
 > As there is no ability to `mmap` in PHP, this has been delegated to a python subprocess.  The python has been kept to an absolute minimum 
 > (<25 lines) in terms of complexity to allow flexibility at PHP level.
 
-> This subprocess is plugable, so it should be easy enough to replace it with a PHP extension down the track.
+> **This means that you MUST have python installed alongside PHP for it to function (at all!).** This subprocess is plugable, so it should be easy enough to replace it with a PHP extension down the track.
 
 
 ## Setup

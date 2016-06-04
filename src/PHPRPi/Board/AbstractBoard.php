@@ -32,7 +32,7 @@ abstract class AbstractBoard implements BoardInterface {
      *
      * Register for gpio functions
      */
-    private $register_gpio;
+    private $gpio_register;
 
     /**
      * @var Pin[]
@@ -42,26 +42,26 @@ abstract class AbstractBoard implements BoardInterface {
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
 
-        $this->register_gpio = new GPIO($this->getPeripheralBaseAddress());
+        $this->gpio_register = new GPIO($this);
 
 
 
-        $this->register_gpio[0x4c] = 0b100000000000000000;
-        $this->register_gpio[0x58] = 0b100000000000000000;
-        $this->register_gpio[0x64] = 0;
-        $this->register_gpio[0x70] = 0;
-        $this->register_gpio[0x7c] = 0;
-        $this->register_gpio[0x88] = 0;
-
-            $loop->addPeriodicTimer(0.01, function(){
-            if($this->register_gpio[0x40] > 0){
-                echo 'press';
-                $this->register_gpio[0x40] = 0b11111111111111111111111111111111;
-                echo decbin($this->register_gpio[0x40]);
-                echo "\n";
-            }
-        });
-
+//        $this->register_gpio[0x4c] = 0b100000000000000000;
+//        $this->register_gpio[0x58] = 0b100000000000000000;
+//        $this->register_gpio[0x64] = 0;
+//        $this->register_gpio[0x70] = 0;
+//        $this->register_gpio[0x7c] = 0;
+//        $this->register_gpio[0x88] = 0;
+//
+//            $loop->addPeriodicTimer(0.01, function(){
+//            if($this->register_gpio[0x40] > 0){
+//                echo 'press';
+//                $this->register_gpio[0x40] = 0b11111111111111111111111111111111;
+//                echo decbin($this->register_gpio[0x40]);
+//                echo "\n";
+//            }
+//        });
+//
 
 
     }
@@ -93,6 +93,13 @@ abstract class AbstractBoard implements BoardInterface {
         }
 
         throw new InvalidPinModeException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
+    }
+
+    /**
+     * @return GPIO
+     */
+    public function getGPIORegister() {
+        return $this->gpio_register;
     }
 
 }
