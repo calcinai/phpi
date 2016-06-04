@@ -10,8 +10,11 @@
     }
   ],
   "require": {
-    "react/event-loop": "^0.4.1",
-    "react/child-process": "^0.4.0"
+    "calcinai/php-mmap": "^0.1",
+    "react/event-loop": "^0.4.1"
+  },
+  "suggest": {
+    "cboden/ratchet": "For realtime, bidirectional control from a web browser"
   },
   "autoload": {
     "psr-4": {

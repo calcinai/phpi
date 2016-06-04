@@ -12,7 +12,7 @@ use Calcinai\PHPRPi\Pin;
 use Calcinai\PHPRPi\Register\GPIO;
 use React\EventLoop\LoopInterface;
 
-abstract class AbstractBoard {
+abstract class AbstractBoard implements BoardInterface {
 
     /**
      * @var \React\EventLoop\LibEvLoop|LoopInterface
@@ -39,12 +39,29 @@ abstract class AbstractBoard {
      */
     private $pins = [];
 
-    public function __construct(LoopInterface $loop, $serial_number = null) {
+    public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
-        $this->serial_number = $serial_number;
+
+        $this->register_gpio = new GPIO($this->getPeripheralBaseAddress());
 
 
-        $this->register_gpio = new GPIO();
+
+        $this->register_gpio[0x4c] = 0b100000000000000000;
+        $this->register_gpio[0x58] = 0b100000000000000000;
+        $this->register_gpio[0x64] = 0;
+        $this->register_gpio[0x70] = 0;
+        $this->register_gpio[0x7c] = 0;
+        $this->register_gpio[0x88] = 0;
+
+            $loop->addPeriodicTimer(0.01, function(){
+            if($this->register_gpio[0x40] > 0){
+                echo 'press';
+                $this->register_gpio[0x40] = 0b11111111111111111111111111111111;
+                echo decbin($this->register_gpio[0x40]);
+                echo "\n";
+            }
+        });
+
 
 
     }
@@ -67,10 +84,6 @@ abstract class AbstractBoard {
         return $this->pins[$pin_number];
     }
 
-    protected static function getPinModeMatrix(){
-        return [];
-    }
-
     public function getAltCodeForPinMode($pin_number, $mode){
 
         $matrix = static::getPinModeMatrix();
@@ -81,7 +94,5 @@ abstract class AbstractBoard {
 
         throw new InvalidPinModeException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
     }
-
-    abstract public function getPeripheralBaseAddress();
 
 }

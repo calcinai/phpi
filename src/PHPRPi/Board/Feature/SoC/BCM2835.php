@@ -9,7 +9,7 @@ namespace Calcinai\PHPRPi\Board\Feature\SoC;
 use Calcinai\PHPRPi\Pin\Mode;
 
 trait BCM2835 {
-    protected static function getPinModeMatrix(){
+    public static function getPinModeMatrix(){
         return [
             0 =>  [Mode::SDA0 => Mode::ALT0],
             1 =>  [Mode::SCL0 => Mode::ALT0],
@@ -68,7 +68,7 @@ trait BCM2835 {
         ];
     }
 
-    public function getPeripheralBaseAddress(){
+    public static function getPeripheralBaseAddress(){
         return 0x20000000;
     }
 }

@@ -11,7 +11,7 @@ $pin->setMode(\Calcinai\PHPRPi\Pin\Mode::OUTPUT);
 
 $pin->high();
 
-print_r($pin);
+//print_r($pin);
 
 //
 //

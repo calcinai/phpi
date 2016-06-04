@@ -44,6 +44,7 @@ class Pin {
             $this->mode = $this->board->getAltCodeForPinMode($this->pin_number, $mode);
         }
 
+
     }
 
     public function getMode() {
