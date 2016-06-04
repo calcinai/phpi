@@ -1,5 +1,7 @@
 # php-rpi
 
+*INCOMPLETE WIP - check back later. If you'd like to help send me a message!*
+
 Event driven bindings for the Raspberry Pi GPIO
 
 This library interacts (almost) directly with the peripheral registers for maximum functionality and speed.  See note on `mmap/dma`
