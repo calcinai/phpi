@@ -1,4 +1,4 @@
-# php-rpi
+# PHPi
 
 **INCOMPLETE WIP - check back later. If you'd like to help send me a message!**
 
@@ -18,7 +18,7 @@ Using composer:
 
 ```json
   "require": {
-  	"calcinai/php-rpi": "^0.1"
+  	"calcinai/phpi": "^0.1"
   }
 ```
 
