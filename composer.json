@@ -1,5 +1,5 @@
 {
-  "name": "calcinai/php-rpi",
+  "name": "calcinai/phpi",
   "description": "Event driven bindings for the Raspberry Pi GPIO",
   "type": "Library",
   "license": "MIT",
