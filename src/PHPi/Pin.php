@@ -1,6 +1,6 @@
 <?php
 /**
- * @package    michael
+ * @package    calcinai/phpi
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
@@ -47,6 +47,8 @@ class Pin {
         }
 
         $this->board->getGPIORegister()->setFunction($this);
+
+        return $this;
     }
 
     public function getFunction() {
@@ -56,11 +58,15 @@ class Pin {
     public function high(){
         $this->assertFunction([PinFunction::OUTPUT]);
         $this->board->getGPIORegister()->setPin($this);
+
+        return $this;
     }
 
     public function low(){
         $this->assertFunction([PinFunction::OUTPUT]);
         $this->board->getGPIORegister()->clearPin($this);
+
+        return $this;
     }
 
 

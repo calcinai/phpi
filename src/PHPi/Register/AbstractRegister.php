@@ -1,6 +1,6 @@
 <?php
 /**
- * @package    michael
+ * @package    calcinai/phpi
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
@@ -36,6 +36,7 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
     }
 
     public function offsetSet($offset, $value){
+        //printf("Setting 0x%x to %032b\n", $offset, $value); //Useful to know sometimes
         fseek($this->mmap, $offset);
         fwrite($this->mmap, pack('V', $value));
     }

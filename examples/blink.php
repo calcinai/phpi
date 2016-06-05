@@ -2,72 +2,31 @@
 
 include __DIR__.'/../vendor/autoload.php';
 
+use Calcinai\PHPi\Pin\PinFunction;
+
+
 $loop = \React\EventLoop\Factory::create();
+$board = \Calcinai\PHPi\Factory::create($loop);
 
-$rpi = \Calcinai\PHPi\Factory::create($loop);
+$pin = $board->getPin(4) //BCM pin number
+             ->setFunction(PinFunction::OUTPUT);
 
-$pin = $rpi->getPin(4);
-$pin->setFunction(\Calcinai\PHPi\Pin\PinFunction::OUTPUT);
-
-$count = 0;
-
-$loop->addPeriodicTimer($time = 0.1, function() use($loop, $pin, $time, &$count){
+//Seems to max out at
+$loop->addPeriodicTimer($time = 1, function() use($loop, $pin, $time){
     $pin->high();
 
-    $loop->addTimer($time / 2, function() use($pin, &$count){
-       $pin->low();
-        $count++;
+    $loop->addTimer($time / 2, function() use($pin){
+        $pin->low();
     });
-
 });
 
-
-$loop->addPeriodicTimer($time = 1, function() use(&$count){
-    echo $count."\n";
-    $count = 0;
-});
-
-//print_r($pin);
-
+//Benchmark out of event loop - about 15kHz on Pi3
+//$start = microtime(true);
+//$i = 0;
+//while($i++ < 100000){
+//    $pin->high()->low();
+//}
 //
-//
-//$process->on('exit', function($exitCode, $termSignal) {
-//    echo "Child dead\n";
-//});
-//
-//$process->start($loop);
-//
-//$count = 0;
-//
-//$loop->addPeriodicTimer($time = 0.1, function() use($process, $loop, $time, &$count){
-//    $command = 'w';
-//    $address = 0x1c;
-//    $value = 0b11111111111111111111111111111111;
-//    $process->stdin->write($command.pack('cV', $address, $value));
-//
-//    $loop->addTimer($time / 2, function() use($process, &$count){
-//        $count++;
-//        $command = 'w';
-//        $address = 0x28;
-//        $value = 0b11111111111111111111111111111111;
-//        $process->stdin->write($command.pack('cV', $address, $value));
-//    });
-//
-//});
-//
-
-//
-//$process->stdout->on('data', function($data) {
-//    echo 'data:';
-//    var_dump($data);
-//    $unpacked = unpack('Vvalue', $data);
-//    var_dump($unpacked['value']);
-//    var_dump(decbin($unpacked['value']));
-//});
-//
-//$process->stderr->on('data', function($data) {
-//    print_r($data);
-//});
-
+//echo microtime(true) - $start ."\n";
 
 $loop->run();

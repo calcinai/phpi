@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package    michael
+ * @package    calcinai/phpi
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
@@ -64,12 +64,12 @@ class GPIO extends AbstractRegister {
 
     public function clearPin(Pin $pin){
         list($bank, $mask) = $pin->getAddressMask();
-        $this[static::$GPSET[$bank]] = $mask;
+        $this[static::$GPCLR[$bank]] = $mask;
     }
 
     public function setFunction(Pin $pin) {
         list($bank, $mask, $shift) = $pin->getAddressMask(3);
-        $this[static::$GPSET[$bank]] = $mask & ($pin->getFunction() << $shift);
+        $this[static::$GPFSEL[$bank]] = $mask & ($pin->getFunction() << $shift);
     }
 
 }
