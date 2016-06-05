@@ -46,6 +46,9 @@ class GPIO extends AbstractRegister {
     static $GPFSEL = [self::GPFSEL0, self::GPFSEL1, self::GPFSEL2, self::GPFSEL3, self::GPFSEL4, self::GPFSEL5];
     static $GPSET = [self::GPSET0, self::GPSET1];
     static $GPCLR = [self::GPCLR0, self::GPCLR1];
+    static $GPLEV = [self::GPLEV0, self::GPLEV1];
+
+    static $GPPUDCLK = [self::GPPUDCLK0, self::GPPUDCLK1];
 
     public static function getOffset() {
         return 0x200000;
@@ -70,6 +73,20 @@ class GPIO extends AbstractRegister {
     public function setFunction(Pin $pin) {
         list($bank, $mask, $shift) = $pin->getAddressMask(3);
         $this[static::$GPFSEL[$bank]] = $mask & ($pin->getFunction() << $shift);
+    }
+
+    public function pinLevel(Pin $pin){
+        list($bank, $mask, $shift) = $pin->getAddressMask();
+        return ($this[static::$GPLEV[$bank]]);// & $mask) >> $shift;
+    }
+
+    public function setPullUpDown(Pin $pin){
+        list($bank, $mask, $shift) = $pin->getAddressMask();
+        $this[static::GPPUD] = $pin->getPull();
+        usleep(5); //How long are 150 cycles?
+        $this[static::$GPPUDCLK[$bank]] = $mask;
+        usleep(5);
+        $this[static::$GPPUDCLK[$bank]] = 0;
     }
 
 }

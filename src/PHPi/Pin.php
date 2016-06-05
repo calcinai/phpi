@@ -15,6 +15,11 @@ class Pin {
     const LEVEL_LOW  = 0;
     const LEVEL_HIGH = 1;
 
+    const PULL_NONE  = 0b00;
+    const PULL_DOWN  = 0b01;
+    const PULL_UP    = 0b10;
+
+
     /**
      * @var AbstractBoard $board
      */
@@ -30,11 +35,22 @@ class Pin {
      */
     private $function;
 
+    /**
+     * In unknown at start, so has to be actively disabled.
+     *
+     * @var int
+     */
+    private $pull;
+
     private $mask_cache = [];
 
     public function __construct(AbstractBoard $board, $pin_number) {
         $this->board = $board;
         $this->pin_number = $pin_number;
+
+        //This needs to be done since it could be in any state, and the user would never know.
+        //Without this could lead to unpredictable behaviour.
+        $this->setPull(self::PULL_NONE);
     }
 
     public function setFunction($mode) {
@@ -69,6 +85,20 @@ class Pin {
         return $this;
     }
 
+    public function level(){
+        $this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
+        return $this->board->getGPIORegister()->pinLevel($this);
+    }
+
+    public function setPull($direction){
+        $this->assertFunction([PinFunction::INPUT]);
+        $this->board->getGPIORegister()->setPullUpDown($this);
+        return $this;
+    }
+
+    public function getPull() {
+        return $this->pull;
+    }
 
     public function assertFunction(array $valid_functions){
         if(!in_array($this->function, $valid_functions)){

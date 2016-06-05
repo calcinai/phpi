@@ -11,7 +11,7 @@ $board = \Calcinai\PHPi\Factory::create($loop);
 $pin = $board->getPin(4) //BCM pin number
              ->setFunction(PinFunction::OUTPUT);
 
-//Seems to max out at
+//Seems to max out at about 4kHz i Pi3
 $loop->addPeriodicTimer($time = 1, function() use($loop, $pin, $time){
     $pin->high();
 
