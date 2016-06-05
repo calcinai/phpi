@@ -4,10 +4,10 @@ include __DIR__.'/../vendor/autoload.php';
 
 $loop = \React\EventLoop\Factory::create();
 
-$rpi = \Calcinai\PHPRPi\Factory::create($loop);
+$rpi = \Calcinai\PHPi\Factory::create($loop);
 
 $pin = $rpi->getPin(4);
-$pin->setFunction(\Calcinai\PHPRPi\Pin\PinFunction::OUTPUT);
+$pin->setFunction(\Calcinai\PHPi\Pin\PinFunction::OUTPUT);
 
 $count = 0;
 
