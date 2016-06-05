@@ -9,5 +9,5 @@ namespace Calcinai\PHPRPi\Board;
 
 interface BoardInterface {
     public static function getPeripheralBaseAddress();
-    public static function getPinModeMatrix();
+    public static function getPinFunctionMatrix();
 }

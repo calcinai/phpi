@@ -84,9 +84,9 @@ abstract class AbstractBoard implements BoardInterface {
         return $this->pins[$pin_number];
     }
 
-    public function getAltCodeForPinMode($pin_number, $mode){
+    public function getAltCodeForPinFunction($pin_number, $mode){
 
-        $matrix = static::getPinModeMatrix();
+        $matrix = static::getPinFunctionMatrix();
 
         if(isset($matrix[$pin_number][$mode])){
             return $matrix[$pin_number][$mode];

@@ -8,7 +8,7 @@ namespace Calcinai\PHPRPi;
 
 use Calcinai\PHPRPi\Board\AbstractBoard;
 use Calcinai\PHPRPi\Exception\InvalidPinModeException;
-use Calcinai\PHPRPi\Pin\Mode;
+use Calcinai\PHPRPi\Pin\PinFunction;
 
 class Pin {
 
@@ -28,47 +28,47 @@ class Pin {
     /**
      * @var int function select
      */
-    private $mode;
+    private $function;
 
     public function __construct(AbstractBoard $board, $pin_number) {
         $this->board = $board;
         $this->pin_number = $pin_number;
     }
 
-    public function setMode($mode) {
+    public function setFunction($mode) {
 
         if(is_int($mode)){
             //0 <= $function <= 7
-            $this->mode = $mode;
+            $this->function = $mode;
         } else {
-            $this->mode = $this->board->getAltCodeForPinMode($this->pin_number, $mode);
+            $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $mode);
         }
 
 
     }
 
-    public function getMode() {
-        return $this->mode;
+    public function getFunction() {
+        return $this->function;
     }
 
     public function high(){
-        $this->assertMode([Mode::OUTPUT]);
+        $this->assertFunction([PinFunction::OUTPUT]);
         $this->board->getGPIORegister()->setPin($this);
     }
 
     public function low(){
-        $this->assertMode([Mode::OUTPUT]);
+        $this->assertFunction([PinFunction::OUTPUT]);
         $this->board->getGPIORegister()->clearPin($this);
     }
 
 
-    public function assertMode(array $valid_modes){
-        if(!in_array($this->mode, $valid_modes)){
-            throw new InvalidPinModeException(sprintf('Pin %s is in invalid mode (%s) for ->%s(). Supported modes are [%s]',
+    public function assertFunction(array $valid_functions){
+        if(!in_array($this->function, $valid_functions)){
+            throw new InvalidPinModeException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',
                 $this->pin_number,
-                $this->mode,
+                $this->function,
                 debug_backtrace()[1]['function'],
-                implode(',', $valid_modes)));
+                implode(',', $valid_functions)));
         }
         return true;
     }

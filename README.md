@@ -32,7 +32,7 @@ nature (namely under apache/nginx) as this would introduce stability and securit
 
 ### GPIO
 
-GPIO (input) is the default mode of the pin objects. Alternate functions can be accessed by using the ```setMode()``` method.  It is
+GPIO (input) is the default mode of the pin objects. Alternate functions can be accessed by using the ```->setFunction(PinFunction::x)``` method.  It is
  recommended to use the function names as opposed to `ALT0..5` unless you know exactly what you're doing, as quite a lot are reserved.
 A few useful classes are also included for digital interaction.
 
