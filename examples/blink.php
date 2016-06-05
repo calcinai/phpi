@@ -11,7 +11,7 @@ $pin->setFunction(\Calcinai\PHPRPi\Pin\PinFunction::OUTPUT);
 
 $count = 0;
 
-$loop->addPeriodicTimer($time = 0.0001, function() use($loop, $pin, $time, &$count){
+$loop->addPeriodicTimer($time = 0.1, function() use($loop, $pin, $time, &$count){
     $pin->high();
 
     $loop->addTimer($time / 2, function() use($pin, &$count){

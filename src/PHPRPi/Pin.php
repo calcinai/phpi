@@ -30,6 +30,8 @@ class Pin {
      */
     private $function;
 
+    private $mask_cache = [];
+
     public function __construct(AbstractBoard $board, $pin_number) {
         $this->board = $board;
         $this->pin_number = $pin_number;
@@ -44,7 +46,7 @@ class Pin {
             $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $mode);
         }
 
-
+        $this->board->getGPIORegister()->setFunction($this);
     }
 
     public function getFunction() {
@@ -73,18 +75,29 @@ class Pin {
         return true;
     }
 
+
     /**
-     * @param int $bit_multiple
-     * @param int $bits_in_bank
-     * @return int
+     * Function to return the bit mask and shift values for a particular number of bits on the current pin.
+     *
+     * Seems to be a slight gain caching it as a couple of the operations are expensive.
+     *
+     * @param int $bits
+     * @return array[$bank, $mask, $shift]
      */
-    public function getBank($bit_multiple = 1, $bits_in_bank = 32){
-        return (int) floor($this->pin_number * $bit_multiple / $bits_in_bank);
+    public function getAddressMask($bits = 1){
+
+        if(!isset($this->mask_cache[$bits])){
+            $divisor = floor(32 / $bits);
+            $bank = $this->pin_number / $divisor;
+            $shift = ($this->pin_number % $divisor) * $bits;
+            $mask = (1 << $bits) - 1 << $shift;
+
+            $this->mask_cache[$bits] = [$bank, $mask, $shift];
+        }
+
+        return $this->mask_cache[$bits];
     }
 
-    public function getPinBit(){
-        return 1 << ($this->pin_number % 32);
-    }
 
     public function getPinNumber() {
         return $this->pin_number;

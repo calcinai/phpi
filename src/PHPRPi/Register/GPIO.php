@@ -43,6 +43,7 @@ class GPIO extends AbstractRegister {
     const GPPUDCLK1 = 0x009C; // GPIO Pin Pull-up/down Enable Clock 1 (R/W)
 
 
+    static $GPFSEL = [self::GPFSEL0, self::GPFSEL1, self::GPFSEL2, self::GPFSEL3, self::GPFSEL4, self::GPFSEL5];
     static $GPSET = [self::GPSET0, self::GPSET1];
     static $GPCLR = [self::GPCLR0, self::GPCLR1];
 
@@ -57,13 +58,18 @@ class GPIO extends AbstractRegister {
     }
 
     public function setPin(Pin $pin){
-        $address = static::$GPSET[$pin->getBank()];
-        $this[$address] = $pin->getPinBit();
+        list($bank, $mask) = $pin->getAddressMask();
+        $this[static::$GPSET[$bank]] = $mask;
     }
 
     public function clearPin(Pin $pin){
-        $address = static::$GPCLR[$pin->getBank()];
-        $this[$address] = $pin->getPinBit();
+        list($bank, $mask) = $pin->getAddressMask();
+        $this[static::$GPSET[$bank]] = $mask;
+    }
+
+    public function setFunction(Pin $pin) {
+        list($bank, $mask, $shift) = $pin->getAddressMask(3);
+        $this[static::$GPSET[$bank]] = $mask & ($pin->getFunction() << $shift);
     }
 
 }
