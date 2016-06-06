@@ -18,7 +18,7 @@ Using composer:
 
 ```json
   "require": {
-  	"calcinai/phpi": "^0.1"
+  	"calcinai/phpi": "dev-master"
   }
 ```
 
