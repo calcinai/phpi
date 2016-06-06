@@ -92,6 +92,7 @@ class Pin {
 
     public function setPull($direction){
         $this->assertFunction([PinFunction::INPUT]);
+        $this->pull = $direction;
         $this->board->getGPIORegister()->setPullUpDown($this);
         return $this;
     }

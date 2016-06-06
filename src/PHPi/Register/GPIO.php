@@ -77,7 +77,7 @@ class GPIO extends AbstractRegister {
 
     public function pinLevel(Pin $pin){
         list($bank, $mask, $shift) = $pin->getAddressMask();
-        return ($this[static::$GPLEV[$bank]]);// & $mask) >> $shift;
+        return ($this[static::$GPLEV[$bank]] & $mask) >> $shift;
     }
 
     public function setPullUpDown(Pin $pin){

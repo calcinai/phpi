@@ -9,7 +9,8 @@ namespace Calcinai\PHPi\Board;
 
 use Calcinai\PHPi\Exception\InvalidPinModeException;
 use Calcinai\PHPi\Pin;
-use Calcinai\PHPi\Register\GPIO;
+use Calcinai\PHPi\PWM;
+use Calcinai\PHPi\Register;
 use React\EventLoop\LoopInterface;
 
 abstract class AbstractBoard implements BoardInterface {
@@ -28,41 +29,38 @@ abstract class AbstractBoard implements BoardInterface {
 
 
     /**
-     * @var GPIO
+     * @var Register\GPIO
      *
      * Register for gpio functions
      */
     private $gpio_register;
 
     /**
+     * @var Register\PWM
+     */
+    private $pwm_register;
+
+    /**
+     * @var Register\Clock
+     */
+    private $clock_register;
+
+    /**
      * @var Pin[]
      */
     private $pins = [];
 
+    /**
+     * @var PWM[]
+     */
+    private $pwms = [];
+
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
 
-        $this->gpio_register = new GPIO($this);
-
-
-
-//        $this->register_gpio[0x4c] = 0b100000000000000000;
-//        $this->register_gpio[0x58] = 0b100000000000000000;
-//        $this->register_gpio[0x64] = 0;
-//        $this->register_gpio[0x70] = 0;
-//        $this->register_gpio[0x7c] = 0;
-//        $this->register_gpio[0x88] = 0;
-//
-//            $loop->addPeriodicTimer(0.01, function(){
-//            if($this->register_gpio[0x40] > 0){
-//                echo 'press';
-//                $this->register_gpio[0x40] = 0b11111111111111111111111111111111;
-//                echo decbin($this->register_gpio[0x40]);
-//                echo "\n";
-//            }
-//        });
-//
-
+        $this->gpio_register = new Register\GPIO($this);
+        $this->pwm_register = new Register\PWM($this);
+        $this->clock_register = new Register\Clock($this);
 
     }
 
@@ -77,8 +75,7 @@ abstract class AbstractBoard implements BoardInterface {
     public function getPin($pin_number){
 
         if(!isset($this->pins[$pin_number])){
-            $pin = new Pin($this, $pin_number);
-            $this->pins[$pin_number] = $pin;
+            $this->pins[$pin_number] = new Pin($this, $pin_number);
         }
 
         return $this->pins[$pin_number];
@@ -95,11 +92,33 @@ abstract class AbstractBoard implements BoardInterface {
         throw new InvalidPinModeException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
     }
 
+    public function getPWM($pwm_number){
+        if(!isset($this->pwms[$pwm_number])){
+            $this->pwms[$pwm_number] = new PWM($this, $pwm_number);
+        }
+
+        return $this->pwms[$pwm_number];
+    }
+
     /**
-     * @return GPIO
+     * @return Register\GPIO
      */
     public function getGPIORegister() {
         return $this->gpio_register;
+    }
+
+    /**
+     * @return Register\PWM
+     */
+    public function getPWMRegister() {
+        return $this->pwm_register;
+    }
+
+    /**
+     * @return Register\Clock
+     */
+    public function getClockRegister() {
+        return $this->clock_register;
     }
 
 }

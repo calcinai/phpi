@@ -10,6 +10,11 @@ use Calcinai\PHPi\Board\AbstractBoard;
 
 abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
+    /**
+     * Apparently this is for 'safety'
+     */
+    const BCM_PASSWORD = 0x5A000000;
+
     const MMAP_BLOCK_SIZE = 1024;
 
     private $mmap;

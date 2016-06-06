@@ -8,7 +8,7 @@ use Calcinai\PHPi\Pin\PinFunction;
 $loop = \React\EventLoop\Factory::create();
 $board = \Calcinai\PHPi\Factory::create($loop);
 
-$pin = $board->getPin(4) //BCM pin number
+$pin = $board->getPin(18) //BCM pin number
              ->setFunction(PinFunction::OUTPUT);
 
 //Seems to max out at about 4kHz i Pi3
