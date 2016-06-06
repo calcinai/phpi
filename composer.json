@@ -10,6 +10,7 @@
     }
   ],
   "require": {
+    "php": ">=5.5.0",
     "calcinai/php-mmap": "^0.1",
     "react/event-loop": "^0.4.1"
   },

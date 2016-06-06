@@ -16,6 +16,10 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
     public function __construct(AbstractBoard $board) {
         $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
+
+        //Only read 4 bytes at a time, not PHP's 8k default
+        stream_set_chunk_size($this->mmap, 4);
+
         //Should there be a 'register backup' in here that gets replayed on destruct?
     }
 
@@ -31,7 +35,6 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
     public function offsetGet($offset){
         fseek($this->mmap, $offset);
         $unpacked = unpack('Vvalue', fread($this->mmap, 4));
-
         return $unpacked['value'];
     }
 
