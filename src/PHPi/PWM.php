@@ -68,7 +68,6 @@ class PWM {
         $this->setRange(self::DEFAULT_RANGE);
     }
 
-
     /**
      * Duty cucle as a percentage
      *
@@ -127,25 +126,30 @@ class PWM {
      */
     public function start(){
 
+        $pwm_reg = $this->board->getPWMRegister();
         $clock_reg = $this->board->getClockRegister();
+
+        //Backup and stop all
+        $pwm_ctl_state = $pwm_reg[Register\PWM::CTL];
+        $pwm_reg[Register\PWM::CTL] = 0;
 
         $clock_reg[Register\Clock::CNTL] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
         usleep(110);
 
         //Wait for not busy
         while(($clock_reg[Register\Clock::CNTL] & Register\Clock::BUSY) != 0) {
-            usleep(100);
+            usleep(10);
         }
 
-        $clock_reg[Register\Clock::DIV] = Register\AbstractRegister::BCM_PASSWORD | ($this->getDivisor() << 12);
+        $clock_reg[Register\Clock::DIV] = Register\AbstractRegister::BCM_PASSWORD | $this->getDivisor();
 
         $clock_reg[Register\Clock::CNTL] =
             Register\AbstractRegister::BCM_PASSWORD |
             Register\Clock::ENAB |
             Register\Clock::SRC_OSC;
 
-        $pwm_reg = $this->board->getPWMRegister();
-        $pwm_reg[Register\PWM::CTL] |= Register\PWM::$PWEN[$this->pwm_number];
+        //Restore settings
+        $pwm_reg[Register\PWM::CTL] |= $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }
@@ -190,8 +194,5 @@ class PWM {
         return ($divi << 12) | $divf;
     }
 
-    public function resetPWM(){
-
-    }
 
 }

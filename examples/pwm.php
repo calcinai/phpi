@@ -11,7 +11,8 @@ $board = \Calcinai\PHPi\Factory::create($loop);
 $pin = $board->getPin(18) //BCM pin number
              ->setFunction(PinFunction::PWM0);
 
-$pwm = $board->getPWM(0)->start();
+$pwm = $board->getPWM(0)
+             ->start();
 
 
 /**
