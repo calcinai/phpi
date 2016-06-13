@@ -10,6 +10,7 @@ namespace Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidPinModeException;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\PWM;
+use Calcinai\PHPi\Clock;
 use Calcinai\PHPi\Register;
 use React\EventLoop\LoopInterface;
 
@@ -55,6 +56,11 @@ abstract class AbstractBoard implements BoardInterface {
      */
     private $pwms = [];
 
+    /**
+     * @var Clock[]
+     */
+    private $clocks = [];
+
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
 
@@ -99,6 +105,15 @@ abstract class AbstractBoard implements BoardInterface {
 
         return $this->pwms[$pwm_number];
     }
+
+    public function getClock($clock_number){
+        if(!isset($this->clocks[$clock_number])){
+            $this->clocks[$clock_number] = new Clock($this, $clock_number);
+        }
+
+        return $this->clocks[$clock_number];
+    }
+
 
     /**
      * @return Register\GPIO

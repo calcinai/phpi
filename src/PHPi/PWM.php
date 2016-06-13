@@ -16,9 +16,6 @@ class PWM {
     const DEFAULT_FREQUENCY   = 1000;
     const DEFAULT_RANGE       = 1024;
 
-    const BASE_CLOCK_FREQENCY = 19200000;
-    const MIN_FREQUENCY       = 1e-5;
-
     /**
      * @var AbstractBoard
      */
@@ -62,9 +59,9 @@ class PWM {
         $this->pwm_number = $pwm_number;
 
         $this->is_active = false;
+        $this->frequency = self::DEFAULT_FREQUENCY;
 
         $this->setDutyCycle(self::DEFAULT_DUTY_CYCLE);
-        $this->setFrequency(self::DEFAULT_FREQUENCY);
         $this->setRange(self::DEFAULT_RANGE);
     }
 
@@ -89,22 +86,6 @@ class PWM {
     }
 
     /**
-     * @param $frequency
-     * @return $this
-     * @throws InvalidValueException
-     */
-    public function setFrequency($frequency){
-
-        if($frequency < self::MIN_FREQUENCY || $frequency > self::BASE_CLOCK_FREQENCY){
-            throw new InvalidValueException(sprintf('Frequency must be between %s and %s', self::MIN_FREQUENCY, self::BASE_CLOCK_FREQENCY));
-        }
-
-        $this->frequency = $frequency;
-
-        return $this;
-    }
-
-    /**
      * @param $range
      * @return $this
      */
@@ -117,6 +98,23 @@ class PWM {
         return $this;
     }
 
+
+    /**
+     * Really just a proxy for changing the clock freq
+     *
+     * @param $frequency
+     * @return $this
+     * @throws InvalidValueException
+     */
+    public function setFrequency($frequency){
+
+        $this->frequency = $frequency;
+        $this->restart();
+
+        return $this;
+    }
+
+
     /**
      * Start the PWM.
      *
@@ -127,29 +125,16 @@ class PWM {
     public function start(){
 
         $pwm_reg = $this->board->getPWMRegister();
-        $clock_reg = $this->board->getClockRegister();
 
         //Backup and stop all
         $pwm_ctl_state = $pwm_reg[Register\PWM::CTL];
         $pwm_reg[Register\PWM::CTL] = 0;
 
-        $clock_reg[Register\Clock::CNTL] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
-        usleep(110);
-
-        //Wait for not busy
-        while(($clock_reg[Register\Clock::CNTL] & Register\Clock::BUSY) != 0) {
-            usleep(10);
-        }
-
-        $clock_reg[Register\Clock::DIV] = Register\AbstractRegister::BCM_PASSWORD | $this->getDivisor();
-
-        $clock_reg[Register\Clock::CNTL] =
-            Register\AbstractRegister::BCM_PASSWORD |
-            Register\Clock::ENAB |
-            Register\Clock::SRC_OSC;
+        $this->board->getClock(Clock::PWM)->stop()->start($this->frequency);
 
         //Restore settings
-        $pwm_reg[Register\PWM::CTL] |= $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
+        $pwm_reg[Register\PWM::CTL] = Register\PWM::$PWEN[$this->pwm_number];
+//        $pwm_reg[Register\PWM::CTL] = $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }
@@ -172,26 +157,6 @@ class PWM {
 
     public function restart(){
         return $this->stop()->start();
-    }
-
-    /**
-     * Calculate divisor value for PWM1 clock. Base frequency is 19.2MHz
-     *
-     * Not sure if this works correctly
-     *
-     * @return float
-     */
-    private function getDivisor(){
-
-        $divi = self::BASE_CLOCK_FREQENCY / $this->frequency;
-        $divr = self::BASE_CLOCK_FREQENCY % $this->frequency;
-        $divf = $divr * $this->range / self::BASE_CLOCK_FREQENCY;
-
-        if ($divi > $this->range -1){
-            $divi = $this->range -1;
-        }
-
-        return ($divi << 12) | $divf;
     }
 
 
