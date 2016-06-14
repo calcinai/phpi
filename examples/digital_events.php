@@ -12,13 +12,18 @@ use Calcinai\PHPi\Pin\PinFunction;
 $loop = \React\EventLoop\Factory::create();
 $board = \Calcinai\PHPi\Factory::create($loop);
 
-$pin = $board->getPin(17) //BCM pin number
-             ->setFunction(PinFunction::INPUT)
-             ->setPull(Pin::PULL_UP);
+//Switch
+$input = $board->getPin(17)
+    ->setFunction(PinFunction::INPUT)
+    ->setPull(Pin::PULL_UP);
 
-$loop->addPeriodicTimer($time = 0.1, function() use($loop, $pin, $time){
-    var_dump($pin->level());
-});
+//LED
+$output = $board->getPin(18)
+    ->setFunction(PinFunction::OUTPUT);
+
+
+$input->on('high', [$output, 'high']);
+$input->on('low', [$output, 'low']);
 
 
 $loop->run();

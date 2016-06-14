@@ -9,8 +9,13 @@ namespace Calcinai\PHPi;
 use Calcinai\PHPi\Board\AbstractBoard;
 use Calcinai\PHPi\Exception\InvalidPinModeException;
 use Calcinai\PHPi\Pin\PinFunction;
+use Calcinai\PHPi\Peripheral\Register;
+
+use Evenement\EventEmitterTrait;
 
 class Pin {
+
+    use EventEmitterTrait;
 
     const LEVEL_LOW  = 0;
     const LEVEL_HIGH = 1;

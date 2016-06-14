@@ -9,9 +9,9 @@ namespace Calcinai\PHPi\Board;
 
 use Calcinai\PHPi\Exception\InvalidPinModeException;
 use Calcinai\PHPi\Pin;
-use Calcinai\PHPi\PWM;
-use Calcinai\PHPi\Clock;
-use Calcinai\PHPi\Register;
+use Calcinai\PHPi\Peripheral\PWM;
+use Calcinai\PHPi\Peripheral\Clock;
+use Calcinai\PHPi\Peripheral\Register;
 use React\EventLoop\LoopInterface;
 
 abstract class AbstractBoard implements BoardInterface {
@@ -67,6 +67,13 @@ abstract class AbstractBoard implements BoardInterface {
         $this->pwm_register = new Register\PWM($this);
         $this->clock_register = new Register\Clock($this);
 
+        $loop->addPeriodicTimer(0.1, function() {
+            
+            foreach($this->getPinsByFunction(Pin\PinFunction::INPUT) as $input){
+                echo $input->getPinNumber();
+            }
+        });
+
     }
 
     public function getLoop(){
@@ -84,6 +91,18 @@ abstract class AbstractBoard implements BoardInterface {
         }
 
         return $this->pins[$pin_number];
+    }
+
+    /**
+     * @param $function
+     * @return \Generator
+     */
+    public function getPinsByFunction($function){
+        foreach($this->pins as $pin){
+            if($pin->getFunction() === $function){
+                yield $pin;
+            }
+        }
     }
 
     /**

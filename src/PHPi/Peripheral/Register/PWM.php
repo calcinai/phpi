@@ -5,7 +5,7 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi\Register;
+namespace Calcinai\PHPi\Peripheral\Register;
 
 use Calcinai\PHPi\Board\AbstractBoard;
 

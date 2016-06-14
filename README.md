@@ -1,6 +1,6 @@
 # PHPi
 
-**INCOMPLETE WIP - check back later. If you'd like to help send me a message!**
+**INCOMPLETE (but functional) WIP -. If you'd like to help send me a message!**
 
 Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2B, 3B, Compute Module and Pi Zero.
 
@@ -29,6 +29,25 @@ used composer before, I strongly recommend you check it out at https://getcompos
 
 All of this code is designed to be run in cli mode, as root to permit the memory access. It is not recommended to try and run this in a synchronous 
 nature (namely under apache/nginx) as this would introduce stability and security issues.  See below for more information about webservices.
+
+Minimal example of reading and setting a pin
+
+```php
+//If you don't already have an event loop, you'll need to create one to pass in.
+$loop = \React\EventLoop\Factory::create();
+$board = \Calcinai\PHPi\Factory::create($loop);
+
+$pin = $board->getPin(17) //BCM pin number
+             ->setFunction(PinFunction::INPUT)
+             ->setPull(Pin::PULL_UP);
+
+//Will be === to Pin::LEVEL_HIGH or Pin::LEVEL_LOW
+var_dump($pin->level());
+
+$pin->setFunction(PinFunction::OUTPUT)
+$pin->high();
+$pin->low();
+```
 
 ### GPIO
 

@@ -4,9 +4,10 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi\Register;
+namespace Calcinai\PHPi\Peripheral\Register;
 
 use Calcinai\PHPi\Board\AbstractBoard;
+use Calcinai\PHPi\Exception\InternalFailureException;
 
 abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
@@ -20,7 +21,12 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
     private $mmap;
 
     public function __construct(AbstractBoard $board) {
-        $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
+
+        try {
+            $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
+        } catch (\Exception $e){
+            throw new InternalFailureException('Couldn\'t mmap peripheral register, are you running as root?');
+        }
 
         //Only read 4 bytes at a time, not PHP's 8k default
         stream_set_chunk_size($this->mmap, 4);
