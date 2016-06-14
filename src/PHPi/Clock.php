@@ -14,12 +14,12 @@ class Clock {
 
     private $board;
 
-    private $register;
+    private $clock_register;
 
     private $div;
     private $ctl;
 
-    const MIN_FREQUENCY = 1e-5;
+    const MIN_FREQUENCY = 0.0001;
 
     const GP0   = 0;
     const GP1   = 1;
@@ -45,15 +45,16 @@ class Clock {
     ];
 
     static $CLOCK_FREQUENCIES = [
-        Register\Clock::SRC_OSC => 19200000,
+        Register\Clock::SRC_OSC => 192e5, //19.2MHz
         Register\Clock::SRC_PLLA => 0,
-        Register\Clock::SRC_PLLC => 0,
-        Register\Clock::SRC_PLLD => 500000000,
+        Register\Clock::SRC_PLLC => 100e7, //1GHz
+        Register\Clock::SRC_PLLD => 500e6, //500MHz
+        Register\Clock::SRC_HDMI => 216e6, //216MHz
     ];
 
     public function __construct(AbstractBoard $board, $clock_number) {
         $this->board = $board;
-        $this->register = $this->board->getClockRegister();
+        $this->clock_register = $this->board->getClockRegister();
 
         $this->div = static::$DIV[$clock_number];
         $this->ctl = static::$CTL[$clock_number];
@@ -80,17 +81,17 @@ class Clock {
 
         $divi = $base_frequency / $frequency;
         $divr = $base_frequency % $frequency;
-        $divf = ($divr * 4096 / $base_frequency);
+        $divf = ($divr * (1 << 12) / $base_frequency);
 
         $divi = min($divi, 4095);
 
-        $this->register[$this->div] = Register\AbstractRegister::BCM_PASSWORD | ($divi << 12) | $divf;
+        $this->clock_register[$this->div] = Register\AbstractRegister::BCM_PASSWORD | ($divi << 12) | $divf;
         usleep(10);
 
-        $this->register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | $src;
+        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | $src;
         usleep(10);
 
-        $this->register[$this->ctl] |= Register\Clock::ENAB;
+        $this->clock_register[$this->ctl] |= Register\Clock::ENAB;
 
         return $this;
     }
@@ -100,11 +101,11 @@ class Clock {
      */
     public function stop() {
 
-        $this->register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
-//        usleep(110);
+        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
+        usleep(110);
 
         //Wait for not busy
-        while(($this->register[$this->ctl] & Register\Clock::BUSY) != 0) {
+        while(($this->clock_register[$this->ctl] & Register\Clock::BUSY) != 0) {
             usleep(10);
         }
 

@@ -25,6 +25,8 @@ class Pin {
      */
     private $board;
 
+    private $gpio_register;
+
     /**
      * @var int BCM pin number
      */
@@ -46,6 +48,8 @@ class Pin {
 
     public function __construct(AbstractBoard $board, $pin_number) {
         $this->board = $board;
+        $this->gpio_register = $board->getGPIORegister();
+
         $this->pin_number = $pin_number;
 
         //This needs to be done since it could be in any state, and the user would never know.
@@ -62,7 +66,8 @@ class Pin {
             $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $mode);
         }
 
-        $this->board->getGPIORegister()->setFunction($this);
+        list($bank, $mask, $shift) = $this->getAddressMask(3);
+        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = $mask & ($this->function << $shift);
 
         return $this;
     }
@@ -73,27 +78,41 @@ class Pin {
 
     public function high(){
         $this->assertFunction([PinFunction::OUTPUT]);
-        $this->board->getGPIORegister()->setPin($this);
+
+        list($bank, $mask) = $this->getAddressMask();
+        $this->gpio_register[Register\GPIO::$GPSET[$bank]] = $mask;
 
         return $this;
     }
 
     public function low(){
         $this->assertFunction([PinFunction::OUTPUT]);
-        $this->board->getGPIORegister()->clearPin($this);
+
+        list($bank, $mask) = $this->getAddressMask();
+        $this->gpio_register[Register\GPIO::$GPCLR[$bank]] = $mask;
 
         return $this;
     }
 
     public function level(){
         $this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
-        return $this->board->getGPIORegister()->pinLevel($this);
+
+        list($bank, $mask, $shift) = $this->getAddressMask();
+        return ($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift;
+
     }
 
     public function setPull($direction){
         $this->assertFunction([PinFunction::INPUT]);
         $this->pull = $direction;
-        $this->board->getGPIORegister()->setPullUpDown($this);
+
+        list($bank, $mask) = $this->getAddressMask();
+        $this->gpio_register[Register\GPIO::GPPUD] = $this->pull;
+        usleep(5); //How long are 150 cycles?
+        $this->gpio_register[Register\GPIO::$GPPUDCLK[$bank]] = $mask;
+        usleep(5);
+        $this->gpio_register[Register\GPIO::$GPPUDCLK[$bank]] = 0;
+
         return $this;
     }
 
@@ -139,6 +158,5 @@ class Pin {
     public function getPinNumber() {
         return $this->pin_number;
     }
-
 
 }

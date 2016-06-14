@@ -12,14 +12,17 @@ use Calcinai\PHPi\Exception\InvalidValueException;
 
 class PWM {
 
-    const DEFAULT_DUTY_CYCLE  = 50;
-    const DEFAULT_FREQUENCY   = 1000;
-    const DEFAULT_RANGE       = 1024;
+    const DEFAULT_DUTY_CYCLE = 50;
+    const DEFAULT_FREQUENCY  = 1000;
+    const DEFAULT_RANGE      = 1024;
 
-    /**
-     * @var AbstractBoard
-     */
+    const PWM0               = 0;
+    const PWM1               = 1;
+
+
     private $board;
+
+    private $pwm_register;
 
     /**
      * The number of the BCM pwm (0|1)
@@ -27,13 +30,6 @@ class PWM {
      * @var int
      */
     private $pwm_number;
-
-    /**
-     * PWM constructor.
-     * @param AbstractBoard $board
-     * @param $pwm_number
-     */
-
 
     /**
      * Duty cycle
@@ -54,8 +50,14 @@ class PWM {
      */
     private $range;
 
+
+    private $enable_ms;
+
+
     public function __construct(AbstractBoard $board, $pwm_number) {
+
         $this->board = $board;
+        $this->pwm_register = $board->getPWMRegister();
         $this->pwm_number = $pwm_number;
 
         $this->is_active = false;
@@ -63,6 +65,7 @@ class PWM {
 
         $this->setDutyCycle(self::DEFAULT_DUTY_CYCLE);
         $this->setRange(self::DEFAULT_RANGE);
+        $this->setEnableMS(false);
     }
 
     /**
@@ -79,7 +82,7 @@ class PWM {
         }
 
         $this->duty_cycle = $duty;
-        $this->board->getPWMRegister()->offsetSet(Register\PWM::$DAT[$this->pwm_number], $this->duty_cycle / 100 * $this->range);
+        $this->pwm_register[Register\PWM::$DAT[$this->pwm_number]] = $this->duty_cycle / 100 * $this->range;
         usleep(10);
 
         return $this;
@@ -92,7 +95,26 @@ class PWM {
     public function setRange($range){
 
         $this->range = $range;
-        $this->board->getPWMRegister()->offsetSet(Register\PWM::$RNG[$this->pwm_number], $this->range);
+        $this->pwm_register[Register\PWM::$RNG[$this->pwm_number]] = $this->range;
+        usleep(10);
+
+        return $this;
+    }
+
+
+    /**
+     * @param $enable_ms
+     * @return $this
+     */
+    public function setEnableMS($enable_ms){
+
+        $this->enable_ms = $enable_ms;
+        if($this->enable_ms){
+            $this->pwm_register[Register\PWM::CTL] |= Register\PWM::$MSEN[$this->pwm_number];
+        } else {
+            $this->pwm_register[Register\PWM::CTL] &= ~Register\PWM::$MSEN[$this->pwm_number];
+        }
+
         usleep(10);
 
         return $this;
@@ -124,17 +146,14 @@ class PWM {
      */
     public function start(){
 
-        $pwm_reg = $this->board->getPWMRegister();
-
         //Backup and stop all
-        $pwm_ctl_state = $pwm_reg[Register\PWM::CTL];
-        $pwm_reg[Register\PWM::CTL] = 0;
+        $pwm_ctl_state = $this->pwm_register[Register\PWM::CTL];
+        $this->pwm_register[Register\PWM::CTL] = 0;
 
         $this->board->getClock(Clock::PWM)->stop()->start($this->frequency);
 
         //Restore settings
-        $pwm_reg[Register\PWM::CTL] = Register\PWM::$PWEN[$this->pwm_number];
-//        $pwm_reg[Register\PWM::CTL] = $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
+        $this->pwm_register[Register\PWM::CTL] = $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }
@@ -146,11 +165,7 @@ class PWM {
      */
     public function stop(){
 
-        $pwm_reg = $this->board->getPWMRegister();
-        $pwm_reg[Register\PWM::CTL] &= ~Register\PWM::$PWEN[$this->pwm_number];
-
-        // needs some time until the PWM module gets disabled, apparently without the delay the PWM module crashs
-        usleep(1);
+        $this->pwm_register[Register\PWM::CTL] &= ~Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }

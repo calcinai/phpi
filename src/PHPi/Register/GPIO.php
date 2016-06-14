@@ -54,39 +54,4 @@ class GPIO extends AbstractRegister {
         return 0x200000;
     }
 
-    public function __construct(AbstractBoard $board) {
-        parent::__construct($board);
-
-
-    }
-
-    public function setPin(Pin $pin){
-        list($bank, $mask) = $pin->getAddressMask();
-        $this[static::$GPSET[$bank]] = $mask;
-    }
-
-    public function clearPin(Pin $pin){
-        list($bank, $mask) = $pin->getAddressMask();
-        $this[static::$GPCLR[$bank]] = $mask;
-    }
-
-    public function setFunction(Pin $pin) {
-        list($bank, $mask, $shift) = $pin->getAddressMask(3);
-        $this[static::$GPFSEL[$bank]] = $mask & ($pin->getFunction() << $shift);
-    }
-
-    public function pinLevel(Pin $pin){
-        list($bank, $mask, $shift) = $pin->getAddressMask();
-        return ($this[static::$GPLEV[$bank]] & $mask) >> $shift;
-    }
-
-    public function setPullUpDown(Pin $pin){
-        list($bank, $mask, $shift) = $pin->getAddressMask();
-        $this[static::GPPUD] = $pin->getPull();
-        usleep(5); //How long are 150 cycles?
-        $this[static::$GPPUDCLK[$bank]] = $mask;
-        usleep(5);
-        $this[static::$GPPUDCLK[$bank]] = 0;
-    }
-
 }

@@ -47,9 +47,4 @@ class Clock extends AbstractRegister {
         return 0x101000;
     }
 
-    public function __construct(AbstractBoard $board) {
-        parent::__construct($board);
-    }
-
-
 }

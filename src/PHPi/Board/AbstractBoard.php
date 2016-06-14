@@ -28,7 +28,6 @@ abstract class AbstractBoard implements BoardInterface {
      */
     private $serial_number;
 
-
     /**
      * @var Register\GPIO
      *
@@ -87,6 +86,12 @@ abstract class AbstractBoard implements BoardInterface {
         return $this->pins[$pin_number];
     }
 
+    /**
+     * @param $pin_number
+     * @param $mode
+     * @return mixed
+     * @throws InvalidPinModeException
+     */
     public function getAltCodeForPinFunction($pin_number, $mode){
 
         $matrix = static::getPinFunctionMatrix();
@@ -98,6 +103,10 @@ abstract class AbstractBoard implements BoardInterface {
         throw new InvalidPinModeException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
     }
 
+    /**
+     * @param $pwm_number
+     * @return PWM
+     */
     public function getPWM($pwm_number){
         if(!isset($this->pwms[$pwm_number])){
             $this->pwms[$pwm_number] = new PWM($this, $pwm_number);
@@ -106,6 +115,10 @@ abstract class AbstractBoard implements BoardInterface {
         return $this->pwms[$pwm_number];
     }
 
+    /**
+     * @param $clock_number
+     * @return Clock
+     */
     public function getClock($clock_number){
         if(!isset($this->clocks[$clock_number])){
             $this->clocks[$clock_number] = new Clock($this, $clock_number);

@@ -43,16 +43,12 @@ class PWM extends AbstractRegister {
     static $DAT = [self::DAT1, self::DAT2];
     static $RNG = [self::RNG1, self::RNG2];
 
+    static $MSEN = [self::MSEN1, self::MSEN2];
+    static $POLA = [self::POLA1, self::POLA2];
     static $PWEN = [self::PWEN1, self::PWEN2];
 
     public static function getOffset() {
         return 0x20C000;
     }
-
-    public function __construct(AbstractBoard $board) {
-        parent::__construct($board);
-
-    }
-
 
 }
