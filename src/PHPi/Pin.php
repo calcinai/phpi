@@ -72,7 +72,10 @@ class Pin {
         }
 
         list($bank, $mask, $shift) = $this->getAddressMask(3);
-        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = $mask & ($this->function << $shift);
+
+        //This feels like its getting messy!  There must be a way to do this with ^=
+        $reg = $this->gpio_register[Register\GPIO::$GPFSEL[$bank]];
+        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->function << $shift);
 
         return $this;
     }

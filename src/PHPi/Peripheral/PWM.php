@@ -66,6 +66,7 @@ class PWM {
         $this->setDutyCycle(self::DEFAULT_DUTY_CYCLE);
         $this->setRange(self::DEFAULT_RANGE);
         $this->setEnableMS(false);
+
     }
 
     /**
@@ -146,14 +147,17 @@ class PWM {
      */
     public function start(){
 
-        //Backup and stop all
-        $pwm_ctl_state = $this->pwm_register[Register\PWM::CTL];
-        $this->pwm_register[Register\PWM::CTL] = 0;
+        //Backup states
+        $current_control_reg = $this->pwm_register[Register\PWM::CTL];
+        $enable_state = $current_control_reg & (Register\PWM::PWEN1 | Register\PWM::PWEN2);
+
+        //Make sure both disabled
+        $this->pwm_register[Register\PWM::CTL] = $current_control_reg & ~(Register\PWM::PWEN1 | Register\PWM::PWEN2);
 
         $this->board->getClock(Clock::PWM)->stop()->start($this->frequency);
 
         //Restore settings
-        $this->pwm_register[Register\PWM::CTL] = $pwm_ctl_state | Register\PWM::$PWEN[$this->pwm_number];
+        $this->pwm_register[Register\PWM::CTL] = $enable_state | Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }

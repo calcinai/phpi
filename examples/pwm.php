@@ -8,11 +8,14 @@ use Calcinai\PHPi\Pin\PinFunction;
 $loop = \React\EventLoop\Factory::create();
 $board = \Calcinai\PHPi\Factory::create($loop);
 
-$pin = $board->getPin(18) //BCM pin number
-             ->setFunction(PinFunction::PWM0);
+$board->getPin(18)->setFunction(PinFunction::PWM0);
+$board->getPin(19)->setFunction(PinFunction::PWM1);
 
-$pwm = $board->getPWM(\Calcinai\PHPi\PWM::PWM0)
-             ->start();
+$pwm0 = $board->getPWM(\Calcinai\PHPi\Peripheral\PWM::PWM0)
+    ->start();
+
+$pwm1 = $board->getPWM(\Calcinai\PHPi\Peripheral\PWM::PWM1)
+    ->start();
 
 
 /**
@@ -22,14 +25,15 @@ $pwm = $board->getPWM(\Calcinai\PHPi\PWM::PWM0)
  */
 
 
-$loop->addPeriodicTimer($update_interval = 0.01, function() use($pwm){
+$loop->addPeriodicTimer($update_interval = 0.01, function() use($pwm0, $pwm1){
 
     $total_time_ms = 1000;
     //Simple sine easing function to calculate the duty
     $pc = -50 * (cos(M_PI * abs($total_time_ms / 2 - (microtime(true) * 1000) % $total_time_ms) / ($total_time_ms / 2)) - 1);
 
     /** This is the only line relevant to the actual PWM! */
-    $pwm->setDutyCycle($pc);
+    $pwm0->setDutyCycle($pc);
+    $pwm1->setDutyCycle(100-$pc); //Opposite duty
 });
 
 $loop->run();

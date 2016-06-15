@@ -68,7 +68,7 @@ abstract class AbstractBoard implements BoardInterface {
         $this->clock_register = new Register\Clock($this);
 
         $loop->addPeriodicTimer(0.1, function() {
-            
+
             foreach($this->getPinsByFunction(Pin\PinFunction::INPUT) as $input){
                 echo $input->getPinNumber();
             }
