@@ -23,6 +23,11 @@ class Pin {
     const PULL_UP    = 0b10;
 
 
+    const EVENT_CHANGE  = 'change';
+    const EVENT_HIGH    = 'high';
+    const EVENT_LOW     = 'low';
+
+
     /**
      * @var Board $board
      */
@@ -71,15 +76,22 @@ class Pin {
         $this->internal_level = $this->getLevel();
 
         //set up chained events from the change
-        $this->on('change', function($level){
+        $this->on(self::EVENT_CHANGE, function($level){
             if($level === self::LEVEL_HIGH){
-                $this->emit('high');
+                $this->emit(self::EVENT_HIGH);
             } elseif($level === self::LEVEL_LOW) {
-                $this->emit('low');
+                $this->emit(self::EVENT_LOW);
             }
         });
     }
 
+    /**
+     * Set the pin function from IN/OUT/ALT0-5
+     *
+     * @param $mode
+     * @return $this
+     * @throws InvalidPinModeException
+     */
     public function setFunction($mode) {
 
         if(is_int($mode)){
@@ -111,7 +123,7 @@ class Pin {
     public function high(){
         $this->assertFunction([PinFunction::OUTPUT]);
 
-        $this->internal_level = self::LEVEL_HIGH;
+        $this->setInternalLevel(self::LEVEL_HIGH);
 
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPSET[$bank]] = $mask;
@@ -122,7 +134,7 @@ class Pin {
     public function low(){
         $this->assertFunction([PinFunction::OUTPUT]);
 
-        $this->internal_level = self::LEVEL_LOW;
+        $this->setInternalLevel(self::LEVEL_LOW);
 
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPCLR[$bank]] = $mask;
@@ -141,8 +153,8 @@ class Pin {
 
         list($bank, $mask, $shift) = $this->getAddressMask();
         //Record observed level and return
-        $this->internal_level = ($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift;
-        return $this->internal_level;
+        $this->setInternalLevel(($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift);
+        return $this->getInternalLevel();
     }
 
     /**
@@ -151,6 +163,17 @@ class Pin {
     public function getInternalLevel(){
         return $this->internal_level;
     }
+
+    /**
+     * Check the level against what it's known to be and update it
+     */
+    public function setInternalLevel($level){
+        if($level !== $this->internal_level) {
+            $this->emit(self::EVENT_CHANGE, [$level]);
+        }
+        $this->internal_level = $level;
+    }
+
 
     /**
      * @param $direction
@@ -173,15 +196,6 @@ class Pin {
 
     public function getPull() {
         return $this->pull;
-    }
-
-
-    public function checkLevel(){
-
-        $level = $this->getLevel();
-        if($level !== $this->internal_level) {
-            $this->emit('change', [$level]);
-        }
     }
 
     /**

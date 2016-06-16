@@ -15,11 +15,11 @@ use React\EventLoop\Timer\TimerInterface;
 class EdgeDetector {
 
     /**
-     * Should be low enough load to check the registers 100Hz
+     * Should be low enough load to check the registers 50Hz
      *
      * Unfortunately I haven't found a clean way to get the actual interrupts from PHP... yet.
      */
-    const DEFAULT_POLL_INTERVAL = 1;
+    const DEFAULT_POLL_INTERVAL = 0.02;
 
 
     /**
@@ -125,10 +125,10 @@ class EdgeDetector {
                         //Read pin level, which internally processes it if it's new.
 
                         //Toggle the pin level since something has changed (even though if we read it now we may have missed it).
-                        $pin->emit('change', [$pin->getInternalLevel() === Pin::LEVEL_HIGH ? Pin::LEVEL_LOW : Pin::LEVEL_HIGH]);
+                        $pin->setInternalLevel($pin->getInternalLevel() === Pin::LEVEL_HIGH ? Pin::LEVEL_LOW : Pin::LEVEL_HIGH);
                         //Read the level and set it to whatever it is now, it will usually be the toggled state, but if the rise/fall event
                         //was too fast for us to observe, it'll bring the pin back to normal.
-                        $pin->checkLevel();
+                        $pin->getLevel();
                     }
 
                 }
