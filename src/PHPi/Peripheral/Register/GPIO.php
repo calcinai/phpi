@@ -7,7 +7,6 @@
 
 namespace Calcinai\PHPi\Peripheral\Register;
 
-use Calcinai\PHPi\Board\AbstractBoard;
 use Calcinai\PHPi\Pin;
 
 class GPIO extends AbstractRegister {
@@ -47,6 +46,10 @@ class GPIO extends AbstractRegister {
     static $GPSET = [self::GPSET0, self::GPSET1];
     static $GPCLR = [self::GPCLR0, self::GPCLR1];
     static $GPLEV = [self::GPLEV0, self::GPLEV1];
+
+    static $GPEDS = [self::GPEDS0, self::GPEDS1];
+    static $GPREN = [self::GPREN0, self::GPREN1];
+    static $GPFEN = [self::GPFEN0, self::GPFEN1];
 
     static $GPPUDCLK = [self::GPPUDCLK0, self::GPPUDCLK1];
 

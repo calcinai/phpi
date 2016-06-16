@@ -5,16 +5,19 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi\Board;
+namespace Calcinai\PHPi;
 
-use Calcinai\PHPi\Exception\InvalidPinModeException;
-use Calcinai\PHPi\Pin;
-use Calcinai\PHPi\Peripheral\PWM;
+use Calcinai\PHPi\Board\BoardInterface;
 use Calcinai\PHPi\Peripheral\Clock;
+use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
+use Calcinai\PHPi\Pin;
+use Calcinai\PHPi\Pin\EdgeDetector;
+use Calcinai\PHPi\Exception\InvalidPinModeException;
+
 use React\EventLoop\LoopInterface;
 
-abstract class AbstractBoard implements BoardInterface {
+abstract class Board implements BoardInterface {
 
     /**
      * @var \React\EventLoop\LibEvLoop|LoopInterface
@@ -46,6 +49,11 @@ abstract class AbstractBoard implements BoardInterface {
     private $clock_register;
 
     /**
+     * @var EdgeDetector
+     */
+    private $edge_detector;
+
+    /**
      * @var Pin[]
      */
     private $pins = [];
@@ -67,12 +75,7 @@ abstract class AbstractBoard implements BoardInterface {
         $this->pwm_register = new Register\PWM($this);
         $this->clock_register = new Register\Clock($this);
 
-        $loop->addPeriodicTimer(0.1, function() {
-
-            foreach($this->getPinsByFunction(Pin\PinFunction::INPUT) as $input){
-                echo $input->getPinNumber();
-            }
-        });
+        $this->edge_detector = new EdgeDetector($this);
 
     }
 
@@ -166,6 +169,10 @@ abstract class AbstractBoard implements BoardInterface {
      */
     public function getClockRegister() {
         return $this->clock_register;
+    }
+
+    public function getEdgeDetector(){
+        return $this->edge_detector;
     }
 
 }

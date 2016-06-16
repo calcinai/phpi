@@ -7,7 +7,7 @@
 namespace Calcinai\PHPi\Peripheral;
 
 
-use Calcinai\PHPi\Board\AbstractBoard;
+use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
 
 class Clock {
@@ -52,7 +52,7 @@ class Clock {
         Register\Clock::SRC_HDMI => 216e6, //216MHz
     ];
 
-    public function __construct(AbstractBoard $board, $clock_number) {
+    public function __construct(Board $board, $clock_number) {
         $this->board = $board;
         $this->clock_register = $this->board->getClockRegister();
 

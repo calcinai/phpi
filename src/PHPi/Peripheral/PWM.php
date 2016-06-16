@@ -7,7 +7,7 @@
 namespace Calcinai\PHPi\Peripheral;
 
 
-use Calcinai\PHPi\Board\AbstractBoard;
+use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
 
 class PWM {
@@ -54,7 +54,7 @@ class PWM {
     private $enable_ms;
 
 
-    public function __construct(AbstractBoard $board, $pwm_number) {
+    public function __construct(Board $board, $pwm_number) {
 
         $this->board = $board;
         $this->pwm_register = $board->getPWMRegister();

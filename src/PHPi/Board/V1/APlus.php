@@ -7,10 +7,10 @@
 
 namespace  Calcinai\PHPi\Board\V1;
 
-use Calcinai\PHPi\Board\AbstractBoard;
+use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Board\Feature;
 
-class APlus extends AbstractBoard {
+class APlus extends Board {
 
     use Feature\SoC\BCM2835;
     use Feature\HDMI;

@@ -6,11 +6,9 @@
 
 namespace Calcinai\PHPi;
 
-use Calcinai\PHPi\Board\AbstractBoard;
 use Calcinai\PHPi\Exception\InvalidPinModeException;
-use Calcinai\PHPi\Pin\PinFunction;
 use Calcinai\PHPi\Peripheral\Register;
-
+use Calcinai\PHPi\Pin\PinFunction;
 use Evenement\EventEmitterTrait;
 
 class Pin {
@@ -26,7 +24,7 @@ class Pin {
 
 
     /**
-     * @var AbstractBoard $board
+     * @var Board $board
      */
     private $board;
 
@@ -49,9 +47,17 @@ class Pin {
      */
     private $pull;
 
+    /**
+     * Internal level cache - this will only be the last known level, not actually updated until it changes.
+     *
+     * @var null|self::LEVEL_LOW|self::LEVEL_HIGH
+     */
+    private $internal_level;
+
+
     private $mask_cache = [];
 
-    public function __construct(AbstractBoard $board, $pin_number) {
+    public function __construct(Board $board, $pin_number) {
         $this->board = $board;
         $this->gpio_register = $board->getGPIORegister();
 
@@ -60,6 +66,18 @@ class Pin {
         //This needs to be done since it could be in any state, and the user would never know.
         //Without this could lead to unpredictable behaviour.
         $this->setPull(self::PULL_NONE);
+
+        //Set level cache to actual level
+        $this->internal_level = $this->getLevel();
+
+        //set up chained events from the change
+        $this->on('change', function($level){
+            if($level === self::LEVEL_HIGH){
+                $this->emit('high');
+            } elseif($level === self::LEVEL_LOW) {
+                $this->emit('low');
+            }
+        });
     }
 
     public function setFunction($mode) {
@@ -77,6 +95,12 @@ class Pin {
         $reg = $this->gpio_register[Register\GPIO::$GPFSEL[$bank]];
         $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->function << $shift);
 
+        //If it's an input, add it to the edge detect.
+        ///TODO - hook this into adding an actual pin ->on() event.
+        if($mode === PinFunction::INPUT){
+            $this->board->getEdgeDetector()->addPin($this);
+        }
+
         return $this;
     }
 
@@ -87,6 +111,8 @@ class Pin {
     public function high(){
         $this->assertFunction([PinFunction::OUTPUT]);
 
+        $this->internal_level = self::LEVEL_HIGH;
+
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPSET[$bank]] = $mask;
 
@@ -96,20 +122,41 @@ class Pin {
     public function low(){
         $this->assertFunction([PinFunction::OUTPUT]);
 
+        $this->internal_level = self::LEVEL_LOW;
+
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPCLR[$bank]] = $mask;
 
         return $this;
     }
 
-    public function level(){
+    /**
+     * Read the actual pin level from the register
+     *
+     * @return int
+     * @throws InvalidPinModeException
+     */
+    public function getLevel(){
         $this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
 
         list($bank, $mask, $shift) = $this->getAddressMask();
-        return ($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift;
-
+        //Record observed level and return
+        $this->internal_level = ($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift;
+        return $this->internal_level;
     }
 
+    /**
+     * Returns the last observed level of the pin, doesn't actually read it.
+     */
+    public function getInternalLevel(){
+        return $this->internal_level;
+    }
+
+    /**
+     * @param $direction
+     * @return $this
+     * @throws InvalidPinModeException
+     */
     public function setPull($direction){
         $this->assertFunction([PinFunction::INPUT]);
         $this->pull = $direction;
@@ -128,6 +175,22 @@ class Pin {
         return $this->pull;
     }
 
+
+    public function checkLevel(){
+
+        $level = $this->getLevel();
+        if($level !== $this->internal_level) {
+            $this->emit('change', [$level]);
+        }
+    }
+
+    /**
+     * Function to check that a pin is in a particular mode before an action is attempted.
+     *
+     * @param array $valid_functions
+     * @return bool
+     * @throws InvalidPinModeException
+     */
     public function assertFunction(array $valid_functions){
         if(!in_array($this->function, $valid_functions)){
             throw new InvalidPinModeException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',

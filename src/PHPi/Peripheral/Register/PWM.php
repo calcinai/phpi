@@ -7,8 +7,6 @@
 
 namespace Calcinai\PHPi\Peripheral\Register;
 
-use Calcinai\PHPi\Board\AbstractBoard;
-
 class PWM extends AbstractRegister {
 
     /** Registers */

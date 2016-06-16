@@ -9,20 +9,25 @@ namespace Calcinai\PHPi;
 
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\UnsupportedBoardException;
+use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
 
 class Factory {
 
     /**
      * @param LoopInterface $loop
-     * @return Board\AbstractBoard
+     * @return \Calcinai\PHPi\Board
      * @throws UnsupportedBoardException
      */
-    public static function create(LoopInterface $loop) {
+    public static function create(LoopInterface $loop = null) {
+
+        if($loop === null){
+            $loop = LoopFactory::create();
+        }
 
         $board = self::identifyBoard();
 
-        /** @var Board\AbstractBoard $board */
+        /** @var \Calcinai\PHPi\Board $board */
         return new $board($loop);
     }
 

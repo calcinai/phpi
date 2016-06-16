@@ -7,6 +7,8 @@
 
 namespace Calcinai\PHPi\Board;
 
-class Mock extends AbstractBoard {
+use Calcinai\PHPi\Board;
+
+class Mock extends Board {
 
 }

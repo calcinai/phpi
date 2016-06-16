@@ -17,7 +17,7 @@ $pin = $board->getPin(17) //BCM pin number
              ->setPull(Pin::PULL_UP);
 
 $loop->addPeriodicTimer($time = 0.1, function() use($loop, $pin, $time){
-    var_dump($pin->level());
+    var_dump($pin->getLevel());
 });
 
 

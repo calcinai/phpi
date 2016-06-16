@@ -6,7 +6,7 @@
 
 namespace Calcinai\PHPi\Peripheral\Register;
 
-use Calcinai\PHPi\Board\AbstractBoard;
+use Calcinai\PHPi\Board\BoardInterface;
 use Calcinai\PHPi\Exception\InternalFailureException;
 
 abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
@@ -20,7 +20,7 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
     private $mmap;
 
-    public function __construct(AbstractBoard $board) {
+    public function __construct(BoardInterface $board) {
 
         try {
             $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());

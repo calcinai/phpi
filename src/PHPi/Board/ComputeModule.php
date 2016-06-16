@@ -7,9 +7,10 @@
 
 namespace  Calcinai\PHPi\Board;
 
+use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Board\Feature;
 
-class ComputeModule extends AbstractBoard {
+class ComputeModule extends Board {
 
     use Feature\SoC\BCM2835;
 
