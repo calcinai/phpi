@@ -1,6 +1,6 @@
 <?php
 /**
- * @package    michael
+ * @package    calcinai/phpi
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
@@ -12,14 +12,27 @@ use Calcinai\PHPi\Peripheral\Register;
 
 use React\EventLoop\Timer\TimerInterface;
 
+/**
+ * Edge detection via polling the status registers. There's not much efficiency gained by reading them as opposed to the individual levels,
+ * but it does les us detect up to 1 state change between polls and doesn't require checking the current pin level.
+ *
+ * Seems to work ok, 4% CPU on Pi3 with triggers on all pins @ 100Hz.
+ *
+ * Poll frequency can be increased, but will only be useful in some situations - the default frequency will yeild a max delay of 10ms between
+ * the event and the handler being called, which for physical applications is more than enough.
+ *
+ *
+ * Class EdgeDetector
+ * @package Calcinai\PHPi\Pin
+ */
 class EdgeDetector {
 
     /**
-     * Should be low enough load to check the registers 50Hz
+     * Should be low enough load to check the registers 100Hz
      *
      * Unfortunately I haven't found a clean way to get the actual interrupts from PHP... yet.
      */
-    const DEFAULT_POLL_INTERVAL = 0.02;
+    const DEFAULT_POLL_INTERVAL = 0.01;
 
 
     /**

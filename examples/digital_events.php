@@ -9,8 +9,7 @@ include __DIR__.'/../vendor/autoload.php';
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\PinFunction;
 
-$loop = \React\EventLoop\Factory::create();
-$board = \Calcinai\PHPi\Factory::create($loop);
+$board = \Calcinai\PHPi\Factory::create();
 
 //Switch
 $input = $board->getPin(17)
@@ -26,4 +25,4 @@ $input->on('high', [$output, 'low']);
 $input->on('low', [$output, 'high']);
 
 
-$loop->run();
+$board->getLoop()->run();

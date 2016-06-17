@@ -244,4 +244,8 @@ class Pin {
         return $this->pin_number;
     }
 
+    public function getBoard(){
+        return $this->board;
+    }
+
 }
