@@ -30,12 +30,15 @@ used composer before, I strongly recommend you check it out at https://getcompos
 All of this code is designed to be run in cli mode, as root to permit the memory access. It is not recommended to try and run this in a synchronous 
 nature (namely under apache/nginx) as this would introduce stability and security issues.  See below for more information about webservices.
 
+$ht board factory:
+
+```php
+$board = \Calcinai\PHPi\Factory::create();
+```
+
 Minimal example of reading and setting a pin
 
 ```php
-//If you don't already have an event loop, you'll need to create one to pass in.
-$loop = \React\EventLoop\Factory::create();
-$board = \Calcinai\PHPi\Factory::create($loop);
 
 $pin = $board->getPin(17) //BCM pin number
              ->setFunction(PinFunction::INPUT)
@@ -47,6 +50,18 @@ var_dump($pin->level());
 $pin->setFunction(PinFunction::OUTPUT)
 $pin->high();
 $pin->low();
+```
+
+Higher level devices and events
+
+```php
+$button = new Button($board->getPin(17));
+$led = new LED($board->getPin(18));
+
+$button->on('press', [$led, 'on']);
+$button->on('release', [$led, 'off']);
+
+$board->getLoop()->run();
 ```
 
 ### GPIO
@@ -61,6 +76,9 @@ A few useful classes are also included for digital interaction.
 Hardware PWM is supported by this library, and to an extent, so is soft PWM.  As this code runs in the react event loop, it's not practical to 
 interact with the ports more than a few hundred times/sec.
 
+
+### SPI
+...
 
 ### The event loop
 
