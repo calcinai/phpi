@@ -25,13 +25,6 @@ abstract class Board implements BoardInterface {
     private $loop;
 
     /**
-     * @var string
-     *
-     * Pi serial number
-     */
-    private $serial_number;
-
-    /**
      * @var Register\GPIO
      *
      * Register for gpio functions
@@ -94,18 +87,6 @@ abstract class Board implements BoardInterface {
         }
 
         return $this->pins[$pin_number];
-    }
-
-    /**
-     * @param $function
-     * @return \Generator
-     */
-    public function getPinsByFunction($function){
-        foreach($this->pins as $pin){
-            if($pin->getFunction() === $function){
-                yield $pin;
-            }
-        }
     }
 
     /**

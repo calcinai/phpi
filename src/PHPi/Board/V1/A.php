@@ -15,4 +15,6 @@ class A extends Board {
     use Feature\SoC\BCM2835;
     use Feature\HDMI;
 
+
+
 }
