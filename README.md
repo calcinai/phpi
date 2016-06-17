@@ -1,6 +1,6 @@
 # PHPi
 
-**INCOMPLETE (but functional) WIP -. If you'd like to help send me a message!**
+**WIP - If you'd like to help send me a message!**
 
 Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2B, 3B, Compute Module and Pi Zero.
 
@@ -18,7 +18,7 @@ Using composer:
 
 ```json
   "require": {
-  	"calcinai/phpi": "dev-master"
+  	"calcinai/phpi": "^0.1"
   }
 ```
 
