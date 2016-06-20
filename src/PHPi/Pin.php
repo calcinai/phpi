@@ -6,14 +6,16 @@
 
 namespace Calcinai\PHPi;
 
-use Calcinai\PHPi\Exception\InvalidPinModeException;
+use Calcinai\PHPi\Exception\InvalidPinFunctionException;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Pin\PinFunction;
 use Evenement\EventEmitterTrait;
 
 class Pin {
 
-    use EventEmitterTrait;
+    use EventEmitterTrait {
+        on as traitOn;
+    }
 
     const LEVEL_LOW  = 0;
     const LEVEL_HIGH = 1;
@@ -88,17 +90,17 @@ class Pin {
     /**
      * Set the pin function from IN/OUT/ALT0-5
      *
-     * @param $mode
+     * @param $function
      * @return $this
-     * @throws InvalidPinModeException
+     * @throws InvalidPinFunctionException
      */
-    public function setFunction($mode) {
+    public function setFunction($function) {
 
-        if(is_int($mode)){
+        if(is_int($function)){
             //0 <= $function <= 7
-            $this->function = $mode;
+            $this->function = $function;
         } else {
-            $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $mode);
+            $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $function);
         }
 
         list($bank, $mask, $shift) = $this->getAddressMask(3);
@@ -106,12 +108,6 @@ class Pin {
         //This feels like its getting messy!  There must be a way to do this with ^=
         $reg = $this->gpio_register[Register\GPIO::$GPFSEL[$bank]];
         $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->function << $shift);
-
-        //If it's an input, add it to the edge detect.
-        ///TODO - hook this into adding an actual pin ->on() event.
-        if($mode === PinFunction::INPUT){
-            $this->board->getEdgeDetector()->addPin($this);
-        }
 
         return $this;
     }
@@ -146,7 +142,7 @@ class Pin {
      * Read the actual pin level from the register
      *
      * @return int
-     * @throws InvalidPinModeException
+     * @throws InvalidPinFunctionException
      */
     public function getLevel(){
         $this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
@@ -178,7 +174,7 @@ class Pin {
     /**
      * @param $direction
      * @return $this
-     * @throws InvalidPinModeException
+     * @throws InvalidPinFunctionException
      */
     public function setPull($direction){
         $this->assertFunction([PinFunction::INPUT]);
@@ -199,15 +195,31 @@ class Pin {
     }
 
     /**
+     * Overload the trait on() function to hook in an input edge detect.
+     *
+     * @param $event
+     * @param callable $listener
+     */
+    public function on($event, callable $listener){
+        $this->traitOn($event, $listener);
+
+        //If it's an input, add it to the edge detect.
+        ///TODO - hook this into adding an actual pin ->on() event.
+        if($this->function === PinFunction::INPUT){
+            $this->board->getEdgeDetector()->addPin($this);
+        }
+    }
+
+    /**
      * Function to check that a pin is in a particular mode before an action is attempted.
      *
      * @param array $valid_functions
      * @return bool
-     * @throws InvalidPinModeException
+     * @throws InvalidPinFunctionException
      */
     public function assertFunction(array $valid_functions){
         if(!in_array($this->function, $valid_functions)){
-            throw new InvalidPinModeException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',
+            throw new InvalidPinFunctionException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',
                 $this->pin_number,
                 $this->function,
                 debug_backtrace()[1]['function'],

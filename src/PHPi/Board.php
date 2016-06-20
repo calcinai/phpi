@@ -13,7 +13,7 @@ use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\EdgeDetector;
-use Calcinai\PHPi\Exception\InvalidPinModeException;
+use Calcinai\PHPi\Exception\InvalidPinFunctionException;
 
 use React\EventLoop\LoopInterface;
 
@@ -42,7 +42,7 @@ abstract class Board implements BoardInterface {
     private $clock_register;
 
     /**
-     * @var EdgeDetector
+     * @var EdgeDetector\EdgeDetectorInterface
      */
     private $edge_detector;
 
@@ -68,8 +68,12 @@ abstract class Board implements BoardInterface {
         $this->pwm_register = new Register\PWM($this);
         $this->clock_register = new Register\Clock($this);
 
-        $this->edge_detector = new EdgeDetector($this);
+        $this->edge_detector = EdgeDetector\Factory::create($this);
 
+    }
+
+    public function __destruct() {
+        SysFS::cleanup();
     }
 
     public function getLoop(){
@@ -103,7 +107,7 @@ abstract class Board implements BoardInterface {
             return $matrix[$pin_number][$mode];
         }
 
-        throw new InvalidPinModeException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
+        throw new InvalidPinFunctionException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
     }
 
     /**

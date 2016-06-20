@@ -6,6 +6,6 @@
 
 namespace Calcinai\PHPi\Exception;
 
-class InvalidPinModeException extends \Exception {
+class InvalidPinFunctionException extends \Exception {
 
 }

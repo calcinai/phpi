@@ -4,7 +4,7 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi\Pin;
+namespace Calcinai\PHPi\Pin\EdgeDetector;
 
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Pin;
@@ -22,10 +22,10 @@ use React\EventLoop\Timer\TimerInterface;
  * the event and the handler being called, which for physical applications is more than enough.
  *
  *
- * Class EdgeDetector
+ * Class StatusPoll
  * @package Calcinai\PHPi\Pin
  */
-class EdgeDetector {
+class StatusPoll implements EdgeDetectorInterface {
 
     /**
      * Should be low enough load to check the registers 100Hz
@@ -61,6 +61,7 @@ class EdgeDetector {
 
     public function __construct(Board $board) {
         $this->board = $board;
+        $this->pins = [];
         $this->gpio_register = $board->getGPIORegister();
         $this->poll_interval = self::DEFAULT_POLL_INTERVAL;
     }
@@ -120,6 +121,7 @@ class EdgeDetector {
      * @return bool
      */
     public function checkStatusRegisters(){
+
         foreach(Register\GPIO::$GPEDS as $bank => $address){
             $bank_event_bits = $this->gpio_register[$address];
 
