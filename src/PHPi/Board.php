@@ -73,7 +73,7 @@ abstract class Board implements BoardInterface {
     }
 
     public function __destruct() {
-        SysFS::cleanup();
+        Pin\SysFS::cleanup();
     }
 
     public function getLoop(){
@@ -91,23 +91,6 @@ abstract class Board implements BoardInterface {
         }
 
         return $this->pins[$pin_number];
-    }
-
-    /**
-     * @param $pin_number
-     * @param $mode
-     * @return mixed
-     * @throws InvalidPinModeException
-     */
-    public function getAltCodeForPinFunction($pin_number, $mode){
-
-        $matrix = static::getPinFunctionMatrix();
-
-        if(isset($matrix[$pin_number][$mode])){
-            return $matrix[$pin_number][$mode];
-        }
-
-        throw new InvalidPinFunctionException(sprintf('Pin %s does not support [%s]', $pin_number, $mode));
     }
 
     /**
@@ -158,6 +141,13 @@ abstract class Board implements BoardInterface {
 
     public function getEdgeDetector(){
         return $this->edge_detector;
+    }
+
+    /**
+     * Should be overloaded by frature trait
+     */
+    public function getPhysicalPins() {
+        return [];
     }
 
 }

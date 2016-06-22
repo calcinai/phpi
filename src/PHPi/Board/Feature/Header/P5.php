@@ -4,7 +4,9 @@
  * @package    calcinai/phpi
  * @author     Michael Calcinai <michael@calcin.ai>
  */
-class P5 {
+namespace Calcinai\PHPi\Board\Feature\Header;
+
+trait P5 {
 
 
 }

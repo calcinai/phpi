@@ -15,4 +15,5 @@ class B extends Board {
     use Feature\SoC\BCM2837;
     use Feature\HDMI;
     use Feature\Ethernet;
+    use Feature\Header\J8;
 }

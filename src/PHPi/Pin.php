@@ -72,7 +72,7 @@ class Pin {
 
         //This needs to be done since it could be in any state, and the user would never know.
         //Without this could lead to unpredictable behaviour.
-        $this->setPull(self::PULL_NONE);
+        //$this->setPull(self::PULL_NONE); //Maybe it should be up tot he user after all.
 
         //Set level cache to actual level
         $this->internal_level = $this->getLevel();
@@ -113,6 +113,14 @@ class Pin {
     }
 
     public function getFunction() {
+
+        //Go get it if it's not set
+        if(!isset($this->function)){
+            list($bank, $mask, $shift) = $this->getAddressMask(3);
+
+            $this->function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;
+        }
+
         return $this->function;
     }
 
@@ -145,7 +153,8 @@ class Pin {
      * @throws InvalidPinFunctionException
      */
     public function getLevel(){
-        $this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
+        //Can actually be any state
+        //$this->assertFunction([PinFunction::INPUT, PinFunction::OUTPUT]);
 
         list($bank, $mask, $shift) = $this->getAddressMask();
         //Record observed level and return
@@ -162,6 +171,7 @@ class Pin {
 
     /**
      * Check the level against what it's known to be and update it
+     * @param $level
      */
     public function setInternalLevel($level){
         if($level !== $this->internal_level) {
@@ -226,6 +236,35 @@ class Pin {
                 implode(',', $valid_functions)));
         }
         return true;
+    }
+
+
+    /**
+     * @param $function
+     * @return mixed
+     * @throws InvalidPinFunctionException
+     */
+    public function getAltCodeForPinFunction($function){
+
+        $matrix = $this->board->getPinFunctionMatrix();
+
+        if(isset($matrix[$this->pin_number][$function])){
+            return $matrix[$this->pin_number][$function];
+        }
+
+        throw new InvalidPinFunctionException(sprintf('Pin %s does not support [%s]', $this->pin_number, $function));
+    }
+
+    /**
+     * @param $alt_code
+     * @return mixed
+     */
+    public function getPinFunctionForAltCode($alt_code){
+
+        $matrix = $this->board->getPinFunctionMatrix();
+
+        //Return null, not false
+        return array_search($alt_code, $matrix[$this->pin_number]) ?: null;
     }
 
 

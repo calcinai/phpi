@@ -8,7 +8,7 @@ namespace Calcinai\PHPi\Pin\EdgeDetector;
 
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Pin;
-use Calcinai\PHPi\SysFS;
+use Calcinai\PHPi\Pin\SysFS;
 use Calcinai\Rubberneck\Driver\InotifyWait;
 use Calcinai\Rubberneck\Observer;
 

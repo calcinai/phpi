@@ -4,8 +4,9 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi;
+namespace Calcinai\PHPi\Pin;
 
+use Calcinai\PHPi\Pin;
 
 class SysFS {
 
