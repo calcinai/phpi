@@ -15,4 +15,9 @@ class B extends Board {
     use Feature\SoC\BCM2836;
     use Feature\HDMI;
     use Feature\Ethernet;
+    use Feature\Header\J8;
+
+    public static function getBoardName() {
+        return '2 Model B';
+    }
 }

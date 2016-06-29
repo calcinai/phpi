@@ -13,7 +13,6 @@ use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\EdgeDetector;
-use Calcinai\PHPi\Exception\InvalidPinFunctionException;
 
 use React\EventLoop\LoopInterface;
 
@@ -149,5 +148,48 @@ abstract class Board implements BoardInterface {
     public function getPhysicalPins() {
         return [];
     }
+
+
+    /**
+     * Some of this is the same as the factory, but it's a bit more granular.
+     *
+     * the result doesn't null-fill, so it's probably better to isset() if anything's depended on in code.
+     *
+     * @return \stdClass
+     */
+    public static function getMeta(){
+
+        $meta = new \stdClass();
+
+        //Get a whole lot of stuff - parsing them is the same.
+        $info = file_get_contents('/proc/cpuinfo').`lscpu`;
+
+
+        foreach(explode("\n", $info) as $line) {
+            //null,null avoid undefined offset.
+            list($tag, $value) = explode(':', $line, 2) + [null, null];
+
+            switch(strtolower(trim($tag))){
+                case 'revision':
+                    $meta->revision = trim($value);
+                    break;
+                case 'serial':
+                    $meta->serial = trim($value);
+                    break;
+                case 'cpu(s)':
+                    $meta->num_cores = trim($value);
+                    break;
+                case 'model name':
+                    $meta->cpu = trim($value);
+                    break;
+                case 'cpu max mhz':
+                    $meta->speed = trim($value);
+                    break;
+            }
+        }
+
+        return $meta;
+    }
+
 
 }

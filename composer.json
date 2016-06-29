@@ -22,5 +22,6 @@
     "psr-4": {
       "Calcinai\\PHPi\\": "src/PHPi"
     }
-  }
+  },
+  "bin": ["bin/phpi"]
 }

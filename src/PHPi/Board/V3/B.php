@@ -16,4 +16,8 @@ class B extends Board {
     use Feature\HDMI;
     use Feature\Ethernet;
     use Feature\Header\J8;
+
+    public static function getBoardName() {
+        return '3 Model B';
+    }
 }

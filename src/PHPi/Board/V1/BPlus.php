@@ -12,7 +12,12 @@ use Calcinai\PHPi\Board\Feature;
 
 class BPlus extends Board {
 
-    use Feature\Soc\BCM2835;
+    use Feature\SoC\BCM2835;
     use Feature\HDMI;
     use Feature\Ethernet;
+    use Feature\Header\J8;
+
+    public static function getBoardName() {
+        return '1 Model B+';
+    }
 }

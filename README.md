@@ -30,7 +30,9 @@ used composer before, I strongly recommend you check it out at https://getcompos
 All of this code is designed to be run in cli mode, as root to permit the memory access. It is not recommended to try and run this in a synchronous 
 nature (namely under apache/nginx) as this would introduce stability and security issues.  See below for more information about webservices.
 
-$ht board factory:
+You can test your install and get a visual display of the pin states by running ```./bin/phpi info``` from the install directory.
+
+The board factory:
 
 ```php
 $board = \Calcinai\PHPi\Factory::create();

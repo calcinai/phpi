@@ -216,7 +216,6 @@ class Pin {
         $this->traitOn($event, $listener);
 
         //If it's an input, add it to the edge detect.
-        ///TODO - hook this into adding an actual pin ->on() event.
         if($this->function === PinFunction::INPUT){
             $this->board->getEdgeDetector()->addPin($this);
         }

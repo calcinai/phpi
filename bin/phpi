@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Proxy script for executing wave bin scripts. Adapted from a
+# script by Steven Gilberd (steve@erayd.net)
+
+# Get the real directory of this script to prefix the command with
+# http://stackoverflow.com/questions/59895
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+while [ -h "$SOURCE" ]
+do
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+TOOL="php $DIR/$1.php"
+shift
+exec $TOOL $@
