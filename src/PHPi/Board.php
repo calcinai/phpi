@@ -11,6 +11,7 @@ use Calcinai\PHPi\Board\BoardInterface;
 use Calcinai\PHPi\Peripheral\Clock;
 use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
+use Calcinai\PHPi\Peripheral\SPI;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\EdgeDetector;
 
@@ -41,6 +42,16 @@ abstract class Board implements BoardInterface {
     private $clock_register;
 
     /**
+     * @var Register\SPI
+     */
+    private $spi_register;
+
+    /**
+     * @var Register\Auxiliary
+     */
+    private $aux_register;
+
+    /**
      * @var EdgeDetector\EdgeDetectorInterface
      */
     private $edge_detector;
@@ -60,12 +71,19 @@ abstract class Board implements BoardInterface {
      */
     private $clocks = [];
 
+    /**
+     * @var SPI[]
+     */
+    private $spis;
+
+
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
 
         $this->gpio_register = new Register\GPIO($this);
         $this->pwm_register = new Register\PWM($this);
         $this->clock_register = new Register\Clock($this);
+        $this->aux_register = new Register\Auxiliary($this);
 
         $this->edge_detector = EdgeDetector\Factory::create($this);
 
@@ -116,6 +134,17 @@ abstract class Board implements BoardInterface {
         return $this->clocks[$clock_number];
     }
 
+    /**
+     * @param $spi_number
+     * @return SPI
+     */
+    public function getSPI($spi_number){
+        if(!isset($this->spis[$spi_number])){
+            $this->spis[$spi_number] = new SPI($this, $spi_number);
+        }
+
+        return $this->spis[$spi_number];
+    }
 
     /**
      * @return Register\GPIO
@@ -136,6 +165,20 @@ abstract class Board implements BoardInterface {
      */
     public function getClockRegister() {
         return $this->clock_register;
+    }
+
+    /**
+     * @return Register\Auxiliary
+     */
+    public function getAuxRegister() {
+        return $this->aux_register;
+    }
+
+    /**
+     * @return Register\SPI
+     */
+    public function getSPIRegister() {
+        return $this->spi_register;
     }
 
     public function getEdgeDetector(){
