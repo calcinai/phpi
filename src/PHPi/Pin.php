@@ -100,7 +100,7 @@ class Pin {
             //0 <= $function <= 7
             $this->function = $function;
         } else {
-            $this->function = $this->board->getAltCodeForPinFunction($this->pin_number, $function);
+            $this->function = $this->getAltCodeForPinFunction($function);
         }
 
         list($bank, $mask, $shift) = $this->getAddressMask(3);
@@ -115,7 +115,9 @@ class Pin {
     public function getFunction() {
 
         //Go get it if it's not set
-        if(!isset($this->function)){
+        //Actually, it is useful to have this update incase it happens from another thread.
+        //Leaving the block in place for the time being.
+        if(true || !isset($this->function)){
             list($bank, $mask, $shift) = $this->getAddressMask(3);
 
             $this->function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;

@@ -8,13 +8,32 @@ use Calcinai\PHPi\Pin\PinFunction;
 $loop = \React\EventLoop\Factory::create();
 $board = \Calcinai\PHPi\Factory::create($loop);
 
-foreach($board->getPhysicalPins() as $header_name => $physical_pins){
-    renderHeader($board, $header_name, $physical_pins);
-}
+$loop->addPeriodicTimer(0.2, function() use($board){
+
+    //Move cursor back up if it's moved
+    static $num_lines = 0;
+    if($num_lines) {
+        echo "\e[{$num_lines}A";
+    }
+
+    ob_start();
+
+    foreach($board->getPhysicalPins() as $header_name => $physical_pins){
+        renderHeader($board, $header_name, $physical_pins);
+    }
+
+    $buffer = ob_get_clean();
+    echo $buffer;
+
+    //Record how much was printed
+    $num_lines = substr_count($buffer, "\n");
+});
+
+
 
 //$board->getPin(18)->setFunction(PinFunction::OUTPUT);
 
-//$loop->run();
+$loop->run();
 
 
 /**
@@ -24,7 +43,7 @@ foreach($board->getPhysicalPins() as $header_name => $physical_pins){
  */
 function renderHeader($board, $header_name, $physical_pins){
 
-    $table_format = "| %4s | %5s | %3s | %3s | %s %s | %-3s | %-3s | %-5s | %-4s |\n";
+    $table_format = "| %10s | %5s | %3s | %3s | %s %s | %-3s | %-3s | %-5s | %-10s |\n";
 
     //Ha ha...
     $header = sprintf($table_format, 'func', 'type', 'BCM', 'PHY', $header_name, '', 'PHY', 'BCM', 'type', 'func');
@@ -53,7 +72,6 @@ function renderHeader($board, $header_name, $physical_pins){
     } while (next($physical_pins));
 
     echo $hr;
-
 }
 
 
