@@ -83,6 +83,7 @@ abstract class Board implements BoardInterface {
         $this->gpio_register = new Register\GPIO($this);
         $this->pwm_register = new Register\PWM($this);
         $this->clock_register = new Register\Clock($this);
+        $this->spi_register = new Register\SPI($this);
         $this->aux_register = new Register\Auxiliary($this);
 
         $this->edge_detector = EdgeDetector\Factory::create($this);

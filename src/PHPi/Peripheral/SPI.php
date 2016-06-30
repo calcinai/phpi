@@ -8,9 +8,25 @@ namespace Calcinai\PHPi\Peripheral;
 
 
 use Calcinai\PHPi\Board;
-use Calcinai\PHPi\Peripheral\Register\Auxiliary;
 
+/**
+ * Credit to bcm2835.c for the constants and impl hints
+ *
+ * Currently only supporting SPI0, the other two are conditionally in the auxiliary reg.
+ *
+ * Class SPI
+ * @package Calcinai\PHPi\Peripheral
+ */
 class SPI {
+
+    const CS0 = 0; //Chip Select 0
+    const CS1 = 1; //Chip Select 1
+    const CS2 = 2; //Chip Select 2 (ie pins CS1 and CS2 are asserted)
+    const CS_NONE = 3; // CS, control it yourself
+
+
+    const SYSTEM_CLOCK_SPEED = 250e6; //250MHz - Haven't had time to check this yet.
+
 
     /**
      * @var Board
@@ -30,14 +46,6 @@ class SPI {
     private $aux_register;
 
 
-    static $AUXENB = [
-        self::SPI0 => Auxiliary::AUXENB_SPI0,
-        self::SPI1 => Auxiliary::AUXENB_SPI1,
-    ];
-
-
-    const SPI0  = 0;
-    const SPI1  = 1;
 
     public function __construct(Board $board, $spi_number) {
 
@@ -46,10 +54,84 @@ class SPI {
         $this->spi_register = $board->getSPIRegister();
         $this->aux_register = $board->getAuxRegister();
 
-
-        $this->aux_register[Auxiliary::AUX_ENABLES] |= static::$AUXENB[$spi_number];
-
-
-
     }
+
+    /**
+     * @param $frequency
+     * @return $this
+     */
+    public function setClockSpeed($frequency){
+        $divisor =  self::SYSTEM_CLOCK_SPEED / $frequency;
+
+        $this->spi_register[Register\SPI::CLK] = round($divisor);
+
+        return $this;
+    }
+
+
+    /**
+     * Since this is a register state, there's no need to call it on each transfer
+     * (although you could if you were addressing multiple chis)
+     *
+     * @param $cex
+     * @return $this
+     */
+    public function chipSelect($cex) {
+        $this->spi_register[Register\SPI::CS] = Register\SPI::CS_CS & $cex;
+
+        return $this;
+    }
+
+
+    /**
+     *
+     * TODO - handle interrupts and mem barriers
+     *
+     * Maxes out at about 3kB/s, sorry!
+     *
+     * @param $tx_buffer
+     * @param int $cex
+     * @return mixed
+     */
+    public function transfer($tx_buffer, $cex = null){
+
+        if($cex !== null){
+            $this->chipSelect($cex);
+        }
+
+        //Clear TX and RX FIFO, set TA
+        $this->spi_register[Register\SPI::CS] |= Register\SPI::CS_CLEAR | Register\SPI::CS_TA;
+
+
+        //Unpack the bytes and send/receive one by one
+        //Slow because of the shallow FIFO
+        //Also need to pack and unpack so there's a sensible interface to send data
+        $rx_buffer = '';
+        foreach(unpack('c*', $tx_buffer) as $char){
+
+            // Wait for cts
+            while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
+                usleep(1);
+            }
+            $this->spi_register[Register\SPI::FIFO] = $char;
+
+            //Wait for FIFO to be populated
+            while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
+                usleep(1);
+            }
+
+            $rx_buffer .= pack('c', $this->spi_register[Register\SPI::FIFO]);
+        }
+
+        //This one might not be nesessary
+        while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_DONE)) {
+            usleep(1);
+        }
+
+        //Clear TA
+        $this->spi_register[Register\SPI::CS] &= ~Register\SPI::CS_TA;
+
+        return $rx_buffer;
+    }
+
 }

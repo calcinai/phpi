@@ -3,6 +3,7 @@
 include __DIR__.'/../vendor/autoload.php';
 
 use Calcinai\PHPi\Pin\PinFunction;
+use Calcinai\PHPi\External\ADC\Microchip\MCP3004;
 
 
 $loop = \React\EventLoop\Factory::create();
@@ -15,10 +16,10 @@ $board->getPin(11)->setFunction(PinFunction::SPI0_SCLK);
 $board->getPin(8)->setFunction(PinFunction::SPI0_CE0_N);
 
 
-$spi = $board->getSPI(0)
-    ->chipSelect(0)
-    ->setClockSpeed(10000); //~10KHz - will round to a power of 2
+//This construction should probably change.
+$adc = new MCP3004($board->getSPI(0));
+
+print_r($adc);
 
 
-//This can be tested by tying MOSI to MISO, will just echo what is sent.
-var_dump($spi->transfer('hello'));
+$loop->run();
