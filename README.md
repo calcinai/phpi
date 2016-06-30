@@ -11,6 +11,8 @@ This library interacts (almost) directly with the peripheral registers for maxim
 
 > **This means that you MUST have python installed alongside PHP for it to function (at all!).** This subprocess is plugable, so it should be easy enough to replace it with a PHP extension down the track.
 
+This library will function without any kernel drivers/sysfs etc enabled.
+
 
 ## Setup
 
@@ -80,7 +82,9 @@ interact with the ports more than a few hundred times/sec.
 
 
 ### SPI
-...
+
+SPI is supported along with some device protocols (MPC300x etc).  Due to the nature of the implementation, it is limited to about 4kB/s before there is no CPU left!
+
 
 ### The event loop
 

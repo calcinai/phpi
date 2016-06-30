@@ -1,7 +1,12 @@
 <?php
 /**
- * @package    calcinai/phpi
- * @author     Michael Calcinai <michael@calcin.ai>
+ * This example is a demonstration of high level events
+ *
+ * Requirements:
+ * Switch pulling BCM pin 17 high
+ * LED anode connected to BCM pin 18
+ * LED anode connected to BCM pin 19
+ *
  */
 
 include __DIR__.'/../vendor/autoload.php';

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * This example makes use of the two onboard PWM outputs, pulsing inverted duty cycles to two LEDs.
+ *
+ * Requirements:
+ * LED anode connected to BCM pin 18
+ * LED anode connected to BCM pin 19
+ *
+ */
+
+
 include __DIR__.'/../vendor/autoload.php';
 
 use Calcinai\PHPi\Pin\PinFunction;

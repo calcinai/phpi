@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * This is a basic example of setting up the SPI port
+ *
+ * Can be tested via loopback by connecting BCM 9 to BCM 10
+ */
+
+
 include __DIR__.'/../vendor/autoload.php';
 
 use Calcinai\PHPi\Pin\PinFunction;

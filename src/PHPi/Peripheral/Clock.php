@@ -10,9 +10,7 @@ namespace Calcinai\PHPi\Peripheral;
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
 
-class Clock {
-
-    private $board;
+class Clock extends AbstractPeripheral {
 
     private $clock_register;
 

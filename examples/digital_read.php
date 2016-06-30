@@ -1,9 +1,11 @@
 <?php
 /**
- * @package    calcinai/phpi
- * @author     Michael Calcinai <michael@calcin.ai>
+ * This example is a crude demonstration of digital inputs
+ *
+ * Requirements:
+ * Any input source that changes the level of BCM pin 17
+ *
  */
-
 include __DIR__.'/../vendor/autoload.php';
 
 use Calcinai\PHPi\Pin;

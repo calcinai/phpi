@@ -17,7 +17,7 @@ use Calcinai\PHPi\Board;
  * Class SPI
  * @package Calcinai\PHPi\Peripheral
  */
-class SPI {
+class SPI extends AbstractPeripheral {
 
     const CS0 = 0; //Chip Select 0
     const CS1 = 1; //Chip Select 1
@@ -26,12 +26,6 @@ class SPI {
 
 
     const SYSTEM_CLOCK_SPEED = 250e6; //250MHz - Haven't had time to check this yet.
-
-
-    /**
-     * @var Board
-     */
-    private $board;
 
     private $spi_number;
 
@@ -107,7 +101,7 @@ class SPI {
         //Slow because of the shallow FIFO
         //Also need to pack and unpack so there's a sensible interface to send data
         $rx_buffer = '';
-        foreach(unpack('c*', $tx_buffer) as $char){
+        foreach(unpack('C*', $tx_buffer) as $char){
 
             // Wait for cts
             while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
@@ -120,7 +114,7 @@ class SPI {
                 usleep(1);
             }
 
-            $rx_buffer .= pack('c', $this->spi_register[Register\SPI::FIFO]);
+            $rx_buffer .= pack('C', $this->spi_register[Register\SPI::FIFO]);
         }
 
         //This one might not be nesessary

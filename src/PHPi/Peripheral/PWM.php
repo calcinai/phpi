@@ -10,7 +10,7 @@ namespace Calcinai\PHPi\Peripheral;
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
 
-class PWM {
+class PWM extends AbstractPeripheral {
 
     const DEFAULT_DUTY_CYCLE = 50;
     const DEFAULT_FREQUENCY  = 1000;
@@ -19,8 +19,6 @@ class PWM {
     const PWM0               = 0;
     const PWM1               = 1;
 
-
-    private $board;
 
     private $pwm_register;
 

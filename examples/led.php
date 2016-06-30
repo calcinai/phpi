@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This example is an example of primitive external devices (LED)
+ *
+ * Requirements:
+ * LED anode connected to BCM pin 18
+ *
+ */
+
 include __DIR__.'/../vendor/autoload.php';
 
 $board = \Calcinai\PHPi\Factory::create();
