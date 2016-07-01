@@ -15,6 +15,8 @@ use React\EventLoop\LoopInterface;
 class Factory {
 
     /**
+     * This is a little messy now sto allow for php 5.4 (no ::class magic)
+     *
      * @param LoopInterface $loop
      * @return \Calcinai\PHPi\Board
      * @throws UnsupportedBoardException
@@ -25,25 +27,12 @@ class Factory {
             $loop = LoopFactory::create();
         }
 
-        $board = self::identifyBoard();
-
-        /** @var \Calcinai\PHPi\Board $board */
-        return new $board($loop);
-    }
-
-
-    /**
-     * @return array, tuple including board class and serial number.
-     * @throws UnsupportedBoardException
-     */
-    private static function identifyBoard() {
-
         $cpuinfo_file = '/proc/cpuinfo';
         $cpuinfo_pattern = '/Hardware\s+:\s(?<soc>.+)\nRevision\s+:\s(?<revision>.+)/';
 
         if(!file_exists($cpuinfo_file) || !preg_match($cpuinfo_pattern, file_get_contents($cpuinfo_file), $matches)){
             //No matches for revision - probably generic Unix
-            return Board\Mock::class;
+            return new Board\Mock($loop);
         }
 
         $soc = $matches['soc'];
@@ -52,36 +41,35 @@ class Factory {
         switch($revision){
             case '0002':
             case '0003':
-                return Board\V1\B::class;
+                return new Board\V1\B($loop);
             case '0004':
             case '0005':
             case '0006':
             case '000d':
             case '000e':
             case '000f':
-                return Board\V1\BRev2::class;
+                return new Board\V1\BRev2($loop);
             case '0007':
             case '0008':
             case '0009':
-                return Board\V1\A::class;
+                return new Board\V1\A($loop);
             case '0010':
-                return Board\V1\BPlus::class;
+                return new Board\V1\BPlus($loop);
             case '0011':
-                return Board\ComputeModule::class;
+                return new Board\ComputeModule($loop);
             case '0012':
-                return Board\V1\APlus::class;
+                return new Board\V1\APlus($loop);
             case 'a01041':
             case 'a21041':
-                return Board\V2\B::class;
+                return new Board\V2\B($loop);
             case '900092':
-                return Board\Zero::class;
+                return new Board\Zero($loop);
             case 'a02082':
             case 'a22082':
-                return Board\V3\B::class;
+                return new Board\V3\B($loop);
         }
 
         throw new UnsupportedBoardException(sprintf('Board revision [%s/%s] is not (yet) supported.', $revision, $soc));
-
     }
 
 }

@@ -57,4 +57,8 @@ class GPIO extends AbstractRegister {
         return 0x200000;
     }
 
+    public static function getDirectMemoryFile() {
+        return '/dev/gpiomem';
+    }
+
 }

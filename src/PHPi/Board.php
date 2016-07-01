@@ -79,15 +79,7 @@ abstract class Board implements BoardInterface {
 
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
-
-        $this->gpio_register = new Register\GPIO($this);
-        $this->pwm_register = new Register\PWM($this);
-        $this->clock_register = new Register\Clock($this);
-        $this->spi_register = new Register\SPI($this);
-        $this->aux_register = new Register\Auxiliary($this);
-
         $this->edge_detector = EdgeDetector\Factory::create($this);
-
     }
 
     public function __destruct() {
@@ -151,6 +143,10 @@ abstract class Board implements BoardInterface {
      * @return Register\GPIO
      */
     public function getGPIORegister() {
+        if(!isset($this->gpio_register)){
+            $this->gpio_register = new Register\GPIO($this);
+        }
+
         return $this->gpio_register;
     }
 
@@ -158,6 +154,10 @@ abstract class Board implements BoardInterface {
      * @return Register\PWM
      */
     public function getPWMRegister() {
+        if(!isset($this->pwm_register)){
+            $this->pwm_register = new Register\PWM($this);
+        }
+
         return $this->pwm_register;
     }
 
@@ -165,6 +165,10 @@ abstract class Board implements BoardInterface {
      * @return Register\Clock
      */
     public function getClockRegister() {
+        if(!isset($this->clock_register)){
+            $this->clock_register = new Register\Clock($this);
+        }
+
         return $this->clock_register;
     }
 
@@ -172,6 +176,10 @@ abstract class Board implements BoardInterface {
      * @return Register\Auxiliary
      */
     public function getAuxRegister() {
+        if(!isset($this->aux_register)){
+            $this->aux_register = new Register\Auxiliary($this);
+        }
+
         return $this->aux_register;
     }
 
@@ -179,8 +187,14 @@ abstract class Board implements BoardInterface {
      * @return Register\SPI
      */
     public function getSPIRegister() {
+        if(!isset($this->spi_register)){
+            $this->spi_register = new Register\SPI($this);
+        }
+
         return $this->spi_register;
     }
+
+
 
     public function getEdgeDetector(){
         return $this->edge_detector;
@@ -197,8 +211,6 @@ abstract class Board implements BoardInterface {
     /**
      * Some of this is the same as the factory, but it's a bit more granular.
      *
-     * the result doesn't null-fill, so it's probably better to isset() if anything's depended on in code.
-     *
      * @return \stdClass
      */
     public static function getMeta(){
@@ -208,6 +220,10 @@ abstract class Board implements BoardInterface {
         //Get a whole lot of stuff - parsing them is the same.
         $info = file_get_contents('/proc/cpuinfo').`lscpu`;
 
+        $meta->serial = 'unknown';
+        $meta->speed = 0;
+        $meta->cpu = 'unknown';
+        $meta->num_cores = 0;
 
         foreach(explode("\n", $info) as $line) {
             //null,null avoid undefined offset.
