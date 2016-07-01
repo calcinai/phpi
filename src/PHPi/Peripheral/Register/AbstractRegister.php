@@ -31,13 +31,13 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
 
         //If there's a direct mapping file, try to use it.
         //Kept this generic in case we eventually get a /dev/spimem, /dev/pwmmem etc
-        if(static::getDirectMemoryFile() !== null) {
+        $dm_file = static::getDirectMemoryFile();
+        if($dm_file !== null && file_exists($dm_file)) {
             try {
-                $this->mmap = mmap_open(static::getDirectMemoryFile(), self::MMAP_BLOCK_SIZE, static::getOffset());
+                $this->mmap = mmap_open($dm_file, self::MMAP_BLOCK_SIZE, static::getOffset());
             } catch(\Exception $e) {
                 $reg_reflect = new \ReflectionClass($this);
-                $gid = filegroup(static::getDirectMemoryFile());
-                throw new InternalFailureException(sprintf('Couldn\'t map %s register.  You must either run as root, or be a member of the %s group.', $reg_reflect->getShortName(), posix_getgrgid($gid)['name']));
+                throw new InternalFailureException(sprintf('Couldn\'t map %s register.  You must either run as root, or be a member of the %s group.', $reg_reflect->getShortName(), posix_getgrgid(filegroup($dm_file))['name']));
             }
         } else {
             try {
