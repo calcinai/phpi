@@ -11,7 +11,11 @@
 
 include __DIR__.'/../vendor/autoload.php';
 
+use Calcinai\PHPi\Peripheral\PWM;
+use Calcinai\PHPi\Peripheral\SPI;
+
 use Calcinai\PHPi\Pin\PinFunction;
+
 use Calcinai\PHPi\External\ADC\Microchip\MCP3004;
 
 
@@ -26,17 +30,15 @@ $board->getPin(8)->setFunction(PinFunction::SPI0_CE0_N);
 
 $board->getPin(18)->setFunction(PinFunction::PWM0);
 
-$pwm = $board->getPWM(\Calcinai\PHPi\Peripheral\PWM::PWM0)->start();
+$pwm = $board->getPWM(PWM::PWM0)->start();
 
+$adc = new MCP3004($board->getSPI(SPI::SPI0), 0);
 
-//This construction should probably change.
-$adc = new MCP3004($board->getSPI(0), 0);
-
-$loop->addPeriodicTimer(0.02, function() use ($adc, $pwm) {
+$adc->getChannel(0)->on('change', function($new_value, $old_value) use ($pwm){
     //Convert to percentage
-    $pc = $adc->read($channel = 0) / 10.24;
-    $pwm->setDutyCycle($pc);
+    $pwm->setDutyCycle($new_value / 10.24);
 });
+
 
 
 $loop->run();

@@ -11,7 +11,7 @@ This library interacts (almost) directly with the peripheral registers for maxim
 
 > **This means that you MUST have python installed alongside PHP for it to function.** _…sortof_
 
-> There is also a [native PHP extension](https://github.com/calcinai/php-ext-mmap) that is a drop-in replacement for the python subprocess, 
+> There is also a [native PHP extension](https://github.com/calcinai/php-ext-mmap) that is a drop-in replacement for the python subprocess 
 > which greatly improves performance.  I'd strongly recommend using it, especially with less powerful Pis.
 
 

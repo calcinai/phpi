@@ -28,5 +28,4 @@ $output = $board->getPin(18)
 $input->on('high', [$output, 'high']);
 $input->on('low', [$output, 'low']);
 
-
 $board->getLoop()->run();

@@ -67,7 +67,6 @@ class StatusPoll implements EdgeDetectorInterface {
     }
 
     public function addPin(Pin $pin){
-
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($bank, $mask, $shift) = $pin->getAddressMask();
         $this->pins[$bank][$shift] = $pin;
@@ -76,7 +75,6 @@ class StatusPoll implements EdgeDetectorInterface {
     }
 
     public function removePin(Pin $pin){
-
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($bank, $mask, $shift) = $pin->getAddressMask();
         unset($this->pins[$bank][$shift]);

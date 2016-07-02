@@ -19,6 +19,8 @@ use Calcinai\PHPi\Board;
  */
 class SPI extends AbstractPeripheral {
 
+    const SPI0 = 0;
+
     const CS0 = 0; //Chip Select 0
     const CS1 = 1; //Chip Select 1
     const CS2 = 2; //Chip Select 2 (ie pins CS1 and CS2 are asserted)

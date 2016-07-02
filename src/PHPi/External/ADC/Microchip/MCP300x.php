@@ -8,18 +8,21 @@
 namespace Calcinai\PHPi\External\ADC\Microchip;
 
 use Calcinai\PHPi\Exception\InvalidChannelException;
+use Calcinai\PHPi\External\ADC\Microchip\MCP300x\Channel;
 use Calcinai\PHPi\Peripheral\SPI;
-use Evenement\EventEmitterTrait;
 
 abstract class MCP300x {
 
-    use EventEmitterTrait {
-        EventEmitterTrait::on as traitOn;
-    }
-
-    const EVENT_CHANGE   = 'change';
+    const DEFAULT_CLOCK_SPEED = 1e6; //1MHz
 
     private $spi;
+    private $spi_channel;
+
+
+    /**
+     * @var Channel[]
+     */
+    private $channels;
 
     /**
      * MCP300x constructor.
@@ -27,40 +30,45 @@ abstract class MCP300x {
      * @param $spi_channel
      */
     public function __construct(SPI $spi, $spi_channel) {
-        $this->spi = $spi;
 
-        $this->spi
-            ->chipSelect($spi_channel)
-            ->setClockSpeed(1000000); //1MHz
+        $this->spi = $spi;
+        $this->spi->setClockSpeed(self::DEFAULT_CLOCK_SPEED);
+
+        $this->spi_channel = $spi_channel;
+
+        for($channel_number = 0; $channel_number < $this->getNumChannels(); $channel_number++){
+            $this->channels[$channel_number] = new Channel($this, $channel_number);
+        }
     }
 
-    public function read($channel_number){
-        //gte because it's 0-indexed
-        if($channel_number >= $this->getNumChannels()){
+    /**
+     * @return SPI
+     */
+    public function getSPI() {
+        return $this->spi;
+    }
+
+    /**
+     * @param $channel_number
+     * @return Channel
+     * @throws InvalidChannelException
+     */
+    public function getChannel($channel_number){
+
+        if(!isset($this->channels[$channel_number])){
             throw new InvalidChannelException(sprintf('Channel %s out of range for this ADC', $channel_number));
         }
 
-        //Non-diff mode.  Needs to be added, not hardcoded.
-        $channel_bits = 0b10000000 | ($channel_number << 4) ;
-
-        //start bit, channel/diff, padding for value
-        $read_pack = pack('C*', 1, $channel_bits, 0);
-        $read = unpack('C*', $this->spi->transfer($read_pack));
-
-        return (($read[2] << 8) | $read[3]) & 0x3FF;
+        return $this->channels[$channel_number];
     }
 
-//Need to think about this more.
-//    /**
-//     * Hijack to start polling
-//     *
-//     * @param $event
-//     */
-//    public function on($event, callable $function){
-//        $this->traitOn($event, $function);
-//
-//        $this->spi->getBoard()->getLoop()->addPeriodicTimer(self::POLL_FREQUENCY, [$this, 'checkValue']);
-//    }
+    /**
+     * @param $buffer
+     * @return string
+     */
+    public function transfer($buffer) {
+        return $this->spi->transfer($buffer, $this->spi_channel);
+    }
 
 
     abstract public function getNumChannels();

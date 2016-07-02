@@ -6,16 +6,14 @@
 
 namespace Calcinai\PHPi;
 
+use Calcinai\PHPi\Traits\EventEmitterTrait;
 use Calcinai\PHPi\Exception\InvalidPinFunctionException;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Pin\PinFunction;
-use Evenement\EventEmitterTrait;
 
 class Pin {
 
-    use EventEmitterTrait {
-        on as traitOn;
-    }
+    use EventEmitterTrait;
 
     const LEVEL_LOW  = 0;
     const LEVEL_HIGH = 1;
@@ -76,15 +74,6 @@ class Pin {
 
         //Set level cache to actual level
         $this->internal_level = $this->getLevel();
-
-        //set up chained events from the change
-        $this->on(self::EVENT_CHANGE, function($level){
-            if($level === self::LEVEL_HIGH){
-                $this->emit(self::EVENT_HIGH);
-            } elseif($level === self::LEVEL_LOW) {
-                $this->emit(self::EVENT_LOW);
-            }
-        });
     }
 
     /**
@@ -207,21 +196,6 @@ class Pin {
     }
 
     /**
-     * Overload the trait on() function to hook in an input edge detect.
-     *
-     * @param $event
-     * @param callable $listener
-     */
-    public function on($event, callable $listener){
-        $this->traitOn($event, $listener);
-
-        //If it's an input, add it to the edge detect.
-        if($this->function === PinFunction::INPUT){
-            $this->board->getEdgeDetector()->addPin($this);
-        }
-    }
-
-    /**
      * Function to check that a pin is in a particular mode before an action is attempted.
      *
      * @param array $valid_functions
@@ -299,5 +273,39 @@ class Pin {
     public function getBoard(){
         return $this->board;
     }
+
+
+    /**
+     * Internal function to fire the appropriate events when the pin level changes
+     *
+     * @param $level
+     */
+    public function onPinChangeEvent($level){
+        //Mainly just connecting up events here
+        if($level === self::LEVEL_HIGH){
+            $this->emit(self::EVENT_HIGH);
+        } elseif($level === self::LEVEL_LOW) {
+            $this->emit(self::EVENT_LOW);
+        }
+    }
+
+    //Meta events for setting up polling
+    public function eventListenerAdded(){
+        //If it's the first event, chain listeners and add to edge detect
+        if($this->countListeners() === 1){
+            $this->on(self::EVENT_CHANGE, [$this, 'onPinChangeEvent']);
+            $this->board->getEdgeDetector()->addPin($this);
+        }
+    }
+
+
+    public function eventListenerRemoved(){
+        //If it's the last event, there's the internal one for change->high/low so this is 1
+        if($this->countListeners() === 1){
+            $this->board->getEdgeDetector()->removePin($this);
+            $this->removeAllListeners();
+        }
+    }
+
 
 }
