@@ -32,7 +32,7 @@ $pwm = $board->getPWM(\Calcinai\PHPi\Peripheral\PWM::PWM0)->start();
 //This construction should probably change.
 $adc = new MCP3004($board->getSPI(0), 0);
 
-$loop->addPeriodicTimer(0.05, function() use ($adc, $pwm) {
+$loop->addPeriodicTimer(0.02, function() use ($adc, $pwm) {
     //Convert to percentage
     $pc = $adc->read($channel = 0) / 10.24;
     $pwm->setDutyCycle($pc);

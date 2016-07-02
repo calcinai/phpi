@@ -31,7 +31,7 @@ abstract class MCP300x {
 
         $this->spi
             ->chipSelect($spi_channel)
-            ->setClockSpeed(1000000); //k
+            ->setClockSpeed(1000000); //1MHz
     }
 
     public function read($channel_number){

@@ -82,6 +82,7 @@ class SPI extends AbstractPeripheral {
      * TODO - handle interrupts and mem barriers
      *
      * Maxes out at about 3kB/s, sorry!
+     * Can get to about 20kB/s with ext-mmap - woohoo!
      *
      * @param $tx_buffer
      * @param int $cex

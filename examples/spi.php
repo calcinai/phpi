@@ -29,3 +29,14 @@ $spi = $board->getSPI(0)
 
 //This can be tested by tying MOSI to MISO, will just echo what is sent.
 var_dump($spi->transfer('hello'));
+
+
+//Benchmark -
+// 20kb/s with 1MHz clock and ext-mmap
+// 3kb/s with 1MHz without ext-mmap
+//$start = microtime(true);
+//$i = 0;
+//while($i++<10000)
+//    $spi->transfer('hello');
+//
+//echo (microtime(true) - $start) ."\n";

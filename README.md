@@ -6,10 +6,14 @@ Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2
 
 This library interacts (almost) directly with the peripheral registers for maximum functionality and speed.  See note on `mmap/dma`
 
-> As there is no ability to `mmap` in PHP, this has been delegated to a python subprocess.  The python has been kept to an absolute minimum 
+> As there is no ability to `mmap` in PHP, by default, this has been delegated to a python subprocess.  The python has been kept to an absolute minimum 
 > (<25 lines) in terms of complexity to allow flexibility at PHP level.
 
-> **This means that you MUST have python installed alongside PHP for it to function (at all!).** This subprocess is plugable, so it should be easy enough to replace it with a PHP extension down the track.
+> **This means that you MUST have python installed alongside PHP for it to function (at all!).** _…sortof_
+
+> There is also a [https://github.com/calcinai/php-ext-mmap](native PHP extension) that is a drop-in replacement for the python subprocess, 
+> which greatly improves performance.  I'd strongly recommend using it, especially with less powerful Pis.
+
 
 This library will function without any kernel drivers/sysfs etc enabled.
 
@@ -83,7 +87,8 @@ interact with the ports more than a few hundred times/sec.
 
 ### SPI
 
-SPI is supported along with some device protocols (MPC300x etc).  Due to the nature of the implementation, it is limited to about 4kB/s before there is no CPU left!
+SPI is supported along with some device protocols (MPC300x etc).  With the default python-mmap, it is limited to about 3kB/s before there is no CPU left!  With
+the native extension, you can reach speeds of over 20kB/s.
 
 
 ### The event loop
