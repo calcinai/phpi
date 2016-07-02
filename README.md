@@ -9,7 +9,7 @@ This library interacts (almost) directly with the peripheral registers for maxim
 > As there is no ability to `mmap` in PHP, by default, this has been delegated to a python subprocess.  The python has been kept to an absolute minimum 
 > (<25 lines) in terms of complexity to allow flexibility at PHP level.
 
-> **This means that you MUST have python installed alongside PHP for it to function (at all!).** _…sortof_
+> **This means that you MUST have python installed alongside PHP for it to function.** _…sortof_
 
 > There is also a [https://github.com/calcinai/php-ext-mmap](native PHP extension) that is a drop-in replacement for the python subprocess, 
 > which greatly improves performance.  I'd strongly recommend using it, especially with less powerful Pis.
