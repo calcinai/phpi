@@ -33,16 +33,16 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
         //Kept this generic in case we eventually get a /dev/spimem, /dev/pwmmem etc
         $dm_file = static::getDirectMemoryFile();
         if($dm_file !== null && file_exists($dm_file)) {
-            try {
-                $this->mmap = mmap_open($dm_file, self::MMAP_BLOCK_SIZE, static::getOffset());
-            } catch(\Exception $e) {
+            $this->mmap = @mmap_open($dm_file, self::MMAP_BLOCK_SIZE, static::getOffset());
+
+            if($this->mmap === false){
                 $reg_reflect = new \ReflectionClass($this);
                 throw new InternalFailureException(sprintf('Couldn\'t map %s register.  You must either run as root, or be a member of the %s group.', $reg_reflect->getShortName(), posix_getgrgid(filegroup($dm_file))['name']));
             }
         } else {
-            try {
-                $this->mmap = mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
-            } catch (\Exception $e) {
+            $this->mmap = @mmap_open('/dev/mem', self::MMAP_BLOCK_SIZE, $board->getPeripheralBaseAddress() + static::getOffset());
+
+            if($this->mmap === false){
                 $reg_reflect = new \ReflectionClass($this);
                 throw new InternalFailureException(sprintf('Couldn\'t map %s register. Are you running as root?', $reg_reflect->getShortName()));
             }
@@ -54,6 +54,11 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess {
         //Should there be a 'register backup' in here that gets replayed on destruct?
     }
 
+    public function __destruct(){
+        if(is_resource($this->mmap)){
+            fclose($this->mmap);
+        }
+    }
 
     /**
      * This is to facilitate registers that have a way of direct (unprivileged) access, eg the /dev/gpiomem
