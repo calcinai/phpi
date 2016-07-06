@@ -3,7 +3,14 @@
 
 //This is a bit.. a lot untidy, but it serves the purpose for now.
 
-include __DIR__ . '/../vendor/autoload.php';
+//Let this script be run from anywhere
+$base_dir = __DIR__;
+do {
+    if(file_exists("$base_dir/vendor/autoload.php")){ include "$base_dir/vendor/autoload.php"; break; };
+    if($base_dir === '/') throw new Exception('Couldn\'t find composer autoloader');
+} while ($base_dir = dirname($base_dir));
+
+
 
 use Calcinai\PHPi\Pin\PinFunction;
 
