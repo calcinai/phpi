@@ -231,15 +231,21 @@ class Pin {
     }
 
     /**
-     * @param $alt_code
-     * @return mixed
+     * @return string|null
      */
-    public function getPinFunctionForAltCode($alt_code){
+    public function getFunctionName(){
+
+        $function = $this->getFunction();
+        if($function === PinFunction::INPUT) {
+            return 'in';
+        }elseif($function === PinFunction::OUTPUT) {
+            return 'out';
+        }
 
         $matrix = $this->board->getPinFunctionMatrix();
 
         //Return null, not false
-        return array_search($alt_code, $matrix[$this->pin_number]) ?: null;
+        return array_search($function, $matrix[$this->pin_number]) ?: null;
     }
 
 

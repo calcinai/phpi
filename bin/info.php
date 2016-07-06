@@ -3,14 +3,7 @@
 
 //This is a bit.. a lot untidy, but it serves the purpose for now.
 
-//Let this script be run from anywhere
-$base_dir = __DIR__;
-do {
-    if(file_exists("$base_dir/vendor/autoload.php")){ include "$base_dir/vendor/autoload.php"; break; };
-    if($base_dir === '/') throw new Exception('Couldn\'t find composer autoloader');
-} while ($base_dir = dirname($base_dir));
-
-
+include __DIR__ . '/../vendor/autoload.php';
 
 use Calcinai\PHPi\Pin\PinFunction;
 
@@ -111,14 +104,7 @@ function getPinAttributes($board, $gpio_number){
         $attributes->level = null;
     } else {
         $pin = $board->getPin($gpio_number);
-
-        $function = $pin->getPinFunctionForAltCode($pin->getFunction());
-        if($function === null){
-            //Means it's in/out
-            $function = $pin->getFunction() === PinFunction::INPUT ? 'in' : 'out';
-        }
-
-        $attributes->function = $function;
+        $attributes->function = $pin->getFunctionName();
         $attributes->level = $pin->getLevel();
     }
 
