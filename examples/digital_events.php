@@ -25,7 +25,7 @@ $output = $board->getPin(18)
     ->setFunction(PinFunction::OUTPUT);
 
 
-$input->on('high', [$output, 'high']);
-$input->on('low', [$output, 'low']);
+$input->on('level.high', [$output, 'high']);
+$input->on('level.low', [$output, 'low']);
 
 $board->getLoop()->run();

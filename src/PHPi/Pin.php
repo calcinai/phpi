@@ -23,9 +23,11 @@ class Pin {
     const PULL_UP    = 0b10;
 
 
-    const EVENT_CHANGE  = 'change';
-    const EVENT_HIGH    = 'high';
-    const EVENT_LOW     = 'low';
+    const EVENT_FUNCTION_CHANGE = 'function.change';
+
+    const EVENT_LEVEL_CHANGE    = 'level.change';
+    const EVENT_HIGH            = 'level.high';
+    const EVENT_LOW             = 'level.low';
 
 
     /**
@@ -41,16 +43,20 @@ class Pin {
     private $pin_number;
 
     /**
-     * @var int function select
-     */
-    private $function;
-
-    /**
      * In unknown at start, so has to be actively disabled.
      *
      * @var int
      */
     private $pull;
+
+
+    /**
+     * Internal function cache - this will only be the last known function, not actually updated until it changes.
+     *
+     * @var int function select
+     */
+    private $internal_function;
+
 
     /**
      * Internal level cache - this will only be the last known level, not actually updated until it changes.
@@ -74,6 +80,7 @@ class Pin {
 
         //Set level cache to actual level
         $this->internal_level = $this->getLevel();
+        $this->internal_function = $this->getFunction();
     }
 
     /**
@@ -87,33 +94,101 @@ class Pin {
 
         if(is_int($function)){
             //0 <= $function <= 7
-            $this->function = $function;
+            $this->internal_function = $function;
         } else {
-            $this->function = $this->getAltCodeForPinFunction($function);
+            $this->internal_function = $this->getAltCodeForPinFunction($function);
         }
 
         list($bank, $mask, $shift) = $this->getAddressMask(3);
 
         //This feels like its getting messy!  There must be a way to do this with ^=
         $reg = $this->gpio_register[Register\GPIO::$GPFSEL[$bank]];
-        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->function << $shift);
+        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->internal_function << $shift);
 
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getFunction() {
 
         //Go get it if it's not set
         //Actually, it is useful to have this update incase it happens from another thread.
         //Leaving the block in place for the time being.
-        if(true || !isset($this->function)){
+        if(true || !isset($this->internal_function)){
             list($bank, $mask, $shift) = $this->getAddressMask(3);
 
-            $this->function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;
+            $this->internal_function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;
         }
 
-        return $this->function;
+        return $this->internal_function;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getFunctionName(){
+
+        $function = $this->getFunction();
+        if($function === PinFunction::INPUT) {
+            return 'in';
+        }elseif($function === PinFunction::OUTPUT) {
+            return 'out';
+        }
+
+        $matrix = $this->board->getPinFunctionMatrix();
+
+        //Return null, not false
+        return array_search($function, $matrix[$this->pin_number]) ?: null;
+    }
+
+    /**
+     * @param $function
+     * @return mixed
+     * @throws InvalidPinFunctionException
+     */
+    public function getAltCodeForPinFunction($function){
+
+        $matrix = $this->board->getPinFunctionMatrix();
+
+        if(isset($matrix[$this->pin_number][$function])){
+            return $matrix[$this->pin_number][$function];
+        }
+
+        throw new InvalidPinFunctionException(sprintf('Pin %s does not support [%s]', $this->pin_number, $function));
+    }
+
+    /**
+     * Get the alternative functions for this pin
+     *
+     * @return array
+     */
+    public function getAltFunctions(){
+        $matrix = $this->board->getPinFunctionMatrix();
+
+        return $matrix[$this->pin_number];
+    }
+
+
+    /**
+     * Function to check that a pin is in a particular mode before an action is attempted.
+     *
+     * @param array $valid_functions
+     * @return bool
+     * @throws InvalidPinFunctionException
+     */
+    public function assertFunction(array $valid_functions){
+        if(!in_array($this->getFunction(), $valid_functions)){
+            throw new InvalidPinFunctionException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',
+                $this->pin_number,
+                $this->getFunction(),
+                debug_backtrace()[1]['function'],
+                implode(',', $valid_functions)));
+        }
+        return true;
+    }
+
 
     public function high(){
         $this->assertFunction([PinFunction::OUTPUT]);
@@ -166,9 +241,27 @@ class Pin {
      */
     public function setInternalLevel($level){
         if($level !== $this->internal_level) {
-            $this->emit(self::EVENT_CHANGE, [$level]);
+            $this->emit(self::EVENT_LEVEL_CHANGE, [$level]);
         }
         $this->internal_level = $level;
+    }
+
+    /**
+     * Returns the last observed level of the pin, doesn't actually read it.
+     */
+    public function getInternalFunction(){
+        return $this->internal_function;
+    }
+
+    /**
+     * Check the function against what it's known to be and update it
+     * @param $function
+     */
+    public function setInternalFunction($function){
+        if($function !== $this->internal_function) {
+            $this->emit(self::EVENT_FUNCTION_CHANGE, [$function]);
+        }
+        $this->internal_function = $function;
     }
 
 
@@ -193,59 +286,6 @@ class Pin {
 
     public function getPull() {
         return $this->pull;
-    }
-
-    /**
-     * Function to check that a pin is in a particular mode before an action is attempted.
-     *
-     * @param array $valid_functions
-     * @return bool
-     * @throws InvalidPinFunctionException
-     */
-    public function assertFunction(array $valid_functions){
-        if(!in_array($this->function, $valid_functions)){
-            throw new InvalidPinFunctionException(sprintf('Pin %s is set to invalid function (%s) for ->%s(). Supported functions are [%s]',
-                $this->pin_number,
-                $this->function,
-                debug_backtrace()[1]['function'],
-                implode(',', $valid_functions)));
-        }
-        return true;
-    }
-
-
-    /**
-     * @param $function
-     * @return mixed
-     * @throws InvalidPinFunctionException
-     */
-    public function getAltCodeForPinFunction($function){
-
-        $matrix = $this->board->getPinFunctionMatrix();
-
-        if(isset($matrix[$this->pin_number][$function])){
-            return $matrix[$this->pin_number][$function];
-        }
-
-        throw new InvalidPinFunctionException(sprintf('Pin %s does not support [%s]', $this->pin_number, $function));
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getFunctionName(){
-
-        $function = $this->getFunction();
-        if($function === PinFunction::INPUT) {
-            return 'in';
-        }elseif($function === PinFunction::OUTPUT) {
-            return 'out';
-        }
-
-        $matrix = $this->board->getPinFunctionMatrix();
-
-        //Return null, not false
-        return array_search($function, $matrix[$this->pin_number]) ?: null;
     }
 
 
@@ -299,7 +339,7 @@ class Pin {
     public function eventListenerAdded(){
         //If it's the first event, chain listeners and add to edge detect
         if($this->countListeners() === 1){
-            $this->on(self::EVENT_CHANGE, [$this, 'onPinChangeEvent']);
+            $this->on(self::EVENT_LEVEL_CHANGE, [$this, 'onPinChangeEvent']);
             $this->board->getEdgeDetector()->addPin($this);
         }
     }
