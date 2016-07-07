@@ -138,7 +138,7 @@ class StatusPoll implements EdgeDetectorInterface {
                         //Read pin level, which internally processes it if it's new.
 
                         //Toggle the pin level since something has changed (even though if we read it now we may have missed it).
-                        $pin->setInternalLevel($pin->getInternalLevel() === Pin::LEVEL_HIGH ? Pin::LEVEL_LOW : Pin::LEVEL_HIGH);
+                        $pin->invertInternalLevel();
                         //Read the level and set it to whatever it is now, it will usually be the toggled state, but if the rise/fall event
                         //was too fast for us to observe, it'll bring the pin back to normal.
                         $pin->getLevel();

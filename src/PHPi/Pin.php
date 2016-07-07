@@ -78,9 +78,10 @@ class Pin {
         //Without this could lead to unpredictable behaviour.
         //$this->setPull(self::PULL_NONE); //Maybe it should be up tot he user after all.
 
-        //Set level cache to actual level
-        $this->internal_level = $this->getLevel();
-        $this->internal_function = $this->getFunction();
+        //Set internal level
+        $this->getLevel();
+        //Set internal function
+        $this->getFunction();
     }
 
     /**
@@ -92,20 +93,42 @@ class Pin {
      */
     public function setFunction($function) {
 
-        if(is_int($function)){
-            //0 <= $function <= 7
-            $this->internal_function = $function;
-        } else {
-            $this->internal_function = $this->getAltCodeForPinFunction($function);
+        if(is_string($function)){
+            $function = $this->getAltCodeForPinFunction($function);
         }
 
+        $this->setInternalFunction($function);
         list($bank, $mask, $shift) = $this->getAddressMask(3);
 
         //This feels like its getting messy!  There must be a way to do this with ^=
         $reg = $this->gpio_register[Register\GPIO::$GPFSEL[$bank]];
-        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($this->internal_function << $shift);
+        $this->gpio_register[Register\GPIO::$GPFSEL[$bank]] = ($reg & ~$mask) | ($function << $shift);
 
         return $this;
+    }
+
+
+    /**
+     * Function to cache internal function and emit events
+     *
+     * @return int
+     */
+    private function setInternalFunction($function){
+        if(isset($this->internal_function)){
+            if($this->internal_function !== $function) {
+                //This has to be done so you don't get recursion if you access ->getFunction from within the event.
+                $old_function = $this->internal_function;
+                $this->internal_function = $function;
+
+                $this->emit(self::EVENT_FUNCTION_CHANGE, [$function, $old_function]);
+            }
+            //If it's set and the same, just leave it.
+        } else {
+            //Otherwise, if it's not set, set it.
+            $this->internal_function = $function;
+        }
+
+        return $this->internal_function;
     }
 
     /**
@@ -113,16 +136,12 @@ class Pin {
      */
     public function getFunction() {
 
-        //Go get it if it's not set
-        //Actually, it is useful to have this update incase it happens from another thread.
-        //Leaving the block in place for the time being.
-        if(true || !isset($this->internal_function)){
-            list($bank, $mask, $shift) = $this->getAddressMask(3);
+        list($bank, $mask, $shift) = $this->getAddressMask(3);
+        $function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;
 
-            $this->internal_function = ($this->gpio_register[Register\GPIO::$GPFSEL[$bank]] & $mask) >> $shift;
-        }
+        $this->setInternalFunction($function);
 
-        return $this->internal_function;
+        return $function;
     }
 
     /**
@@ -213,6 +232,37 @@ class Pin {
     }
 
     /**
+     *
+     * @return int
+     */
+    private function setInternalLevel($level){
+        if(isset($this->internal_level)){
+            if($this->internal_level !== $level) {
+                //This has to be done so you don't get recursion if you access ->getFunction from within the event.
+                $this->internal_level = $level;
+
+                $this->emit(self::EVENT_LEVEL_CHANGE, [$level]);
+            }
+            //If it's set and the same, just leave it.
+        } else {
+            //Otherwise, if it's not set, set it.
+            $this->internal_level = $level;
+        }
+
+        return $this->internal_level;
+    }
+
+    /**
+     * Inverts the internal level to emit events.
+     *
+     * Designed for the edge detector to hit when it detects a change.
+     */
+    public function invertInternalLevel() {
+        $this->setInternalLevel($this->internal_level === self::LEVEL_HIGH ? self::LEVEL_LOW : self::LEVEL_HIGH);
+    }
+
+
+    /**
      * Read the actual pin level from the register
      *
      * @return int
@@ -224,44 +274,11 @@ class Pin {
 
         list($bank, $mask, $shift) = $this->getAddressMask();
         //Record observed level and return
-        $this->setInternalLevel(($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift);
-        return $this->getInternalLevel();
-    }
+        $level = ($this->gpio_register[Register\GPIO::$GPLEV[$bank]] & $mask) >> $shift;
 
-    /**
-     * Returns the last observed level of the pin, doesn't actually read it.
-     */
-    public function getInternalLevel(){
-        return $this->internal_level;
-    }
+        $this->setInternalLevel($level);
 
-    /**
-     * Check the level against what it's known to be and update it
-     * @param $level
-     */
-    public function setInternalLevel($level){
-        if($level !== $this->internal_level) {
-            $this->emit(self::EVENT_LEVEL_CHANGE, [$level]);
-        }
-        $this->internal_level = $level;
-    }
-
-    /**
-     * Returns the last observed level of the pin, doesn't actually read it.
-     */
-    public function getInternalFunction(){
-        return $this->internal_function;
-    }
-
-    /**
-     * Check the function against what it's known to be and update it
-     * @param $function
-     */
-    public function setInternalFunction($function){
-        if($function !== $this->internal_function) {
-            $this->emit(self::EVENT_FUNCTION_CHANGE, [$function]);
-        }
-        $this->internal_function = $function;
+        return $level;
     }
 
 
