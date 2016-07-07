@@ -248,6 +248,8 @@ abstract class Board implements BoardInterface {
             }
         }
 
+        $meta->board_name = static::getBoardName();
+
         return $meta;
     }
 

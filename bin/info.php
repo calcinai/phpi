@@ -22,7 +22,7 @@ $loop->addPeriodicTimer(0.5, function() use($board){
 
 
     $meta = $board->getMeta();
-    printf(bold("Raspberry Pi %-15s %44s\n"), $board->getBoardName(), date('r'));
+    printf(bold("Raspberry Pi %-15s %44s\n"), $meta->board_name, date('r'));
     printf("s/n: %s\n", $meta->serial);
     printf("rev: %s, %sMHz, %d cores\n", $meta->revision, $meta->speed, $meta->num_cores);
 
