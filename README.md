@@ -97,4 +97,4 @@ One of the original reasons for basing this project on the [react event loop](ht
 that can be leveraged.  A good example is the websocket server; it will run seamlessly inline with this library to provide *real time, 
 bidirectional, non-polling* interaction with the Pi from any modern browser.
 
-See the websocket example included.
+See [phpi-websocket](https://github.com/calcinai/phpi-websocket) for more on this.
