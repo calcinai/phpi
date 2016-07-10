@@ -17,7 +17,7 @@ trait J8 {
                 3 => new PhysicalPin(3, PhysicalPin::GPIO, 2),
                 4 => new PhysicalPin(4, PhysicalPin::SUPPLY_5V),
                 5 => new PhysicalPin(5, PhysicalPin::GPIO, 3),
-                6 => new PhysicalPin(6, PhysicalPin::SUPPLY_5V),
+                6 => new PhysicalPin(6, PhysicalPin::SUPPLY_GND),
                 7 => new PhysicalPin(7, PhysicalPin::GPIO, 4),
                 8 => new PhysicalPin(8, PhysicalPin::GPIO, 14),
                 9 => new PhysicalPin(9, PhysicalPin::SUPPLY_GND),
