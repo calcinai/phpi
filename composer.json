@@ -2,6 +2,7 @@
   "name": "calcinai/phpi",
   "description": "Event driven bindings for the Raspberry Pi GPIO",
   "type": "Library",
+  "keywords": ["raspberry", "pi", "rpi", "gpio", "websocket", "spi", "pwm"],
   "license": "MIT",
   "authors": [
     {
