@@ -36,19 +36,12 @@ class SPI extends AbstractPeripheral {
      */
     private $spi_register;
 
-    /**
-     * @var Register\SPI
-     */
-    private $aux_register;
-
-
 
     public function __construct(Board $board, $spi_number) {
 
         $this->board = $board;
         $this->spi_number = $spi_number;
         $this->spi_register = $board->getSPIRegister();
-        $this->aux_register = $board->getAuxRegister();
 
     }
 
@@ -92,34 +85,64 @@ class SPI extends AbstractPeripheral {
      */
     public function transfer($tx_buffer, $cex = null){
 
-        if($cex !== null){
-            $this->chipSelect($cex);
-        }
-
-        //Clear TX and RX FIFO, set TA
-        $this->spi_register[Register\SPI::CS] |= Register\SPI::CS_CLEAR | Register\SPI::CS_TA;
-
+        $this->startTransfer();
 
         //Unpack the bytes and send/receive one by one
         //Slow because of the shallow FIFO
         //Also need to pack and unpack so there's a sensible interface to send data
         $rx_buffer = '';
-        foreach(unpack('C*', $tx_buffer) as $char){
+        foreach(unpack('C*', $tx_buffer) as $byte){
 
-            // Wait for cts
-            while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
-                usleep(1);
-            }
-            $this->spi_register[Register\SPI::FIFO] = $char;
-
-            //Wait for FIFO to be populated
-            while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
-                usleep(1);
-            }
-
-            $rx_buffer .= pack('C', $this->spi_register[Register\SPI::FIFO]);
+            $rx_buffer .= $this->transferByte($byte);
         }
 
+        $this->endTransfer();
+
+        return $rx_buffer;
+    }
+
+
+    public function transferBytes(){
+
+    }
+
+
+    public function transferByte($byte, $cex = null){
+
+        //Just in case it's larger.
+        $byte = $byte[0];
+
+        if($cex !== null){
+            $this->chipSelect($cex);
+        }
+
+        // Wait for cts
+        while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
+            usleep(1);
+        }
+        $this->spi_register[Register\SPI::FIFO] = $byte;
+
+        //Wait for FIFO to be populated
+        while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
+            usleep(1);
+        }
+
+        return pack('C', $this->spi_register[Register\SPI::FIFO]);
+
+    }
+
+
+    /**
+     * Clear TX and RX FIFO, set TA
+     */
+    private function startTransfer(){
+        $this->spi_register[Register\SPI::CS] |= Register\SPI::CS_CLEAR | Register\SPI::CS_TA;
+    }
+
+    /**
+     * Wait for transfer to be done then clear TA.
+     */
+    private function endTransfer(){
         //This one might not be nesessary
         while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_DONE)) {
             usleep(1);
@@ -127,8 +150,6 @@ class SPI extends AbstractPeripheral {
 
         //Clear TA
         $this->spi_register[Register\SPI::CS] &= ~Register\SPI::CS_TA;
-
-        return $rx_buffer;
     }
 
 }
