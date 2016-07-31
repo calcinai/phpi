@@ -85,42 +85,41 @@ class SPI extends AbstractPeripheral {
      */
     public function transfer($tx_buffer, $cex = null){
 
+        if($cex !== null){
+            $this->chipSelect($cex);
+        }
+
         $this->startTransfer();
 
         //Unpack the bytes and send/receive one by one
         //Slow because of the shallow FIFO
         //Also need to pack and unpack so there's a sensible interface to send data
         $rx_buffer = '';
-        foreach(unpack('C*', $tx_buffer) as $byte){
+        foreach(unpack('C*', $tx_buffer) as $char){
 
-            $rx_buffer .= $this->transferByte($byte);
+            $rx_buffer .= $this->transferByte($char);
+        }
+
+        //This one might not be nesessary
+        while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_DONE)) {
+            usleep(1);
         }
 
         $this->endTransfer();
-
+        
         return $rx_buffer;
     }
 
 
-    public function transferBytes(){
-
-    }
 
 
-    public function transferByte($byte, $cex = null){
-
-        //Just in case it's larger.
-        $byte = $byte[0];
-
-        if($cex !== null){
-            $this->chipSelect($cex);
-        }
+    private function transferByte($byte){
 
         // Wait for cts
         while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
             usleep(1);
         }
-        $this->spi_register[Register\SPI::FIFO] = $byte;
+        $this->spi_register[Register\SPI::FIFO] = $byte; //Just in case (PHP)
 
         //Wait for FIFO to be populated
         while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
@@ -132,22 +131,12 @@ class SPI extends AbstractPeripheral {
     }
 
 
-    /**
-     * Clear TX and RX FIFO, set TA
-     */
     private function startTransfer(){
+        //Clear TX and RX FIFO, set TA
         $this->spi_register[Register\SPI::CS] |= Register\SPI::CS_CLEAR | Register\SPI::CS_TA;
     }
 
-    /**
-     * Wait for transfer to be done then clear TA.
-     */
     private function endTransfer(){
-        //This one might not be nesessary
-        while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_DONE)) {
-            usleep(1);
-        }
-
         //Clear TA
         $this->spi_register[Register\SPI::CS] &= ~Register\SPI::CS_TA;
     }

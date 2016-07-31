@@ -24,7 +24,7 @@ $board->getPin(8)->setFunction(PinFunction::SPI0_CE0_N);
 
 $spi = $board->getSPI(0)
     ->chipSelect(0)
-    ->setClockSpeed(10000); //~10KHz - will round to a power of 2
+    ->setClockSpeed(1e6); //~1MHz - will round to a power of 2
 
 
 //This can be tested by tying MOSI to MISO, will just echo what is sent.
@@ -34,9 +34,9 @@ var_dump($spi->transfer('hello'));
 //Benchmark -
 // 20kb/s with 1MHz clock and ext-mmap
 // 3kb/s with 1MHz without ext-mmap
-//$start = microtime(true);
-//$i = 0;
-//while($i++<10000)
-//    $spi->transfer('hello');
-//
-//echo (microtime(true) - $start) ."\n";
+$start = microtime(true);
+$i = 0;
+while($i++<100) //1MB
+    $spi->transfer(str_repeat('ten  bytes', 100)); //1000 bytes
+
+echo (microtime(true) - $start) ."\n";
