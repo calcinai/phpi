@@ -6,7 +6,6 @@
 
 namespace Calcinai\PHPi\Peripheral;
 
-
 use Calcinai\PHPi\Board;
 
 /**
@@ -42,7 +41,6 @@ class SPI extends AbstractPeripheral {
         $this->board = $board;
         $this->spi_number = $spi_number;
         $this->spi_register = $board->getSPIRegister();
-
     }
 
     /**
@@ -106,7 +104,7 @@ class SPI extends AbstractPeripheral {
         }
 
         $this->endTransfer();
-        
+
         return $rx_buffer;
     }
 
