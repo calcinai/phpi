@@ -9,10 +9,10 @@
  *
  */
 
-include __DIR__.'/../vendor/autoload.php';
+use Calcinai\PHPi\External\Generic\Button;
+use Calcinai\PHPi\External\Generic\LED;
 
-use Calcinai\PHPi\External\Button;
-use Calcinai\PHPi\External\LED;
+include __DIR__.'/../vendor/autoload.php';
 
 $board = \Calcinai\PHPi\Factory::create();
 

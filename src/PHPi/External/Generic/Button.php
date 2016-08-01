@@ -5,24 +5,12 @@
  * @author     Michael Calcinai <michael@calcin.ai>
  */
 
-namespace Calcinai\PHPi\External;
+namespace Calcinai\PHPi\External\Generic;
 
+use Calcinai\PHPi\External\Input;
 use Calcinai\PHPi\Pin;
-use Calcinai\PHPi\Traits\EventEmitterTrait;
 
-class Button {
-
-    use EventEmitterTrait;
-
-    /**
-     * @var Pin
-     */
-    private $pin;
-
-    /**
-     * @var \React\EventLoop\LibEvLoop|\React\EventLoop\LoopInterface
-     */
-    private $loop;
+class Button extends Input {
 
     /**
      * @var bool
@@ -49,29 +37,27 @@ class Button {
 
 
     public function __construct(Pin $pin, $active_high = true, $press_period = self::DEFAULT_PRESS_PERIOD, $hold_period = self::DEFAULT_HOLD_PERIOD) {
+        parent::__construct($pin);
 
-        $this->pin = $pin;
-        $this->loop = $pin->getBoard()->getLoop();
-        $this->active_high = $active_high;
-
-        $pin->setFunction(Pin\PinFunction::INPUT);
         $this->press_period = $press_period;
         $this->hold_period = $hold_period;
+        $this->active_high = $active_high;
     }
 
 
     /**
+     *
      * Internal function for dealing with a press (high or low) event on the pin
      */
     private function onPinPressEvent(){
 
         //Mainly just connecting up events here
 
-        $press_timer = $this->loop->addTimer($this->press_period, function() {
+        $press_timer = $this->pin->getBoard()->getLoop()->addTimer($this->press_period, function() {
             $this->emit(self::EVENT_PRESS);
         });
 
-        $hold_timer = $this->loop->addTimer($this->hold_period, function() {
+        $hold_timer = $this->pin->getBoard()->getLoop()->addTimer($this->hold_period, function() {
             $this->emit(self::EVENT_HOLD);
         });
 
@@ -86,7 +72,6 @@ class Button {
         });
     }
 
-
     public function eventListenerAdded(){
         //Only interested in the first event added, no advantage to only firing the onces that are being listened to
         if($this->countListeners() !== 1){
@@ -98,13 +83,6 @@ class Button {
         $this->pin->on($press_event, function(){ $this->onPinPressEvent(); });
     }
 
-    public function eventListenerRemoved(){
-        //Only interested in the last event removed
-        if($this->countListeners() !== 0){
-            return;
-        }
-        $this->pin->removeAllListeners();
-    }
 
 
 }

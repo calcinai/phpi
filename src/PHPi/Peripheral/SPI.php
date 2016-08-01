@@ -93,8 +93,7 @@ class SPI extends AbstractPeripheral {
         //Slow because of the shallow FIFO
         //Also need to pack and unpack so there's a sensible interface to send data
         $rx_buffer = '';
-        foreach(unpack('C*', $tx_buffer) as $char){
-
+        foreach(str_split($tx_buffer) as $char){
             $rx_buffer .= $this->transferByte($char);
         }
 
@@ -110,21 +109,20 @@ class SPI extends AbstractPeripheral {
 
 
 
-
     private function transferByte($byte){
 
         // Wait for cts
         while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
             usleep(1);
         }
-        $this->spi_register[Register\SPI::FIFO] = $byte; //Just in case (PHP)
+        $this->spi_register[Register\SPI::FIFO] = ord($byte); //Just in case (PHP)
 
         //Wait for FIFO to be populated
         while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
             usleep(1);
         }
 
-        return pack('C', $this->spi_register[Register\SPI::FIFO]);
+        return chr($this->spi_register[Register\SPI::FIFO]);
 
     }
 
