@@ -1,7 +1,5 @@
 # PHPi
 
-**WIP - If you'd like to help send me a message!**
-
 Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2B, 3B, Compute Module and Pi Zero.
 
 This library interacts (almost) directly with the peripheral registers for maximum functionality and speed.  See note on `mmap/dma`
@@ -22,10 +20,8 @@ This library will function without any kernel drivers/sysfs etc enabled.
 
 Using composer:
 
-```json
-  "require": {
-  	"calcinai/phpi": "^0.1"
-  }
+```
+composer require calcinai/phpi
 ```
 
 Although it is possible to add this to your own autoloader, it's not recommended as you'll have no control of the dependencies.  If you haven't 
@@ -88,7 +84,7 @@ interact with the ports more than a few hundred times/sec.
 ### SPI
 
 SPI is supported along with some device protocols (MPC300x etc).  With the default python-mmap, it is limited to about 3kB/s before there is no CPU left!  With
-the native extension, you can reach speeds of over 20kB/s.
+the native extension, you can reach speeds of over 30kB/s.
 
 
 ### The event loop
@@ -98,3 +94,16 @@ that can be leveraged.  A good example is the websocket server; it will run seam
 bidirectional, non-polling* interaction with the Pi from any modern browser.
 
 See [phpi-websocket](https://github.com/calcinai/phpi-websocket) for more on this.
+
+## External Devices
+
+There are included helper classes for interfacing with common devices, with more added regulary.
+
+* Generic Inputs/Outputs
+* Buttons
+* LEDs
+* Relays
+* ADC (MCP 3xxx series)
+* H Bridge Motors
+* 2 and 4 Phase stepper motors
+
