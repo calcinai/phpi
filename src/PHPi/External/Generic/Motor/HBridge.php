@@ -7,10 +7,10 @@
 
 namespace Calcinai\PHPi\External\Generic\Motor;
 
-use Calcinai\PHPi\External\Generic\Motor;
+use Calcinai\PHPi\External\Generic\MotorInterface;
 use Calcinai\PHPi\Pin;
 
-class HBridge extends Motor{
+class HBridge implements MotorInterface {
 
     /**
      * @var Pin
