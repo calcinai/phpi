@@ -123,7 +123,10 @@ class Stepper implements MotorInterface {
     public function setSpeed($speed){
         $this->speed = $speed;
         $this->period = 1/$speed;
-        return $this->stop()->start();
+
+        if($this->isRunning()){
+            $this->restart();
+        }
     }
 
     /**
@@ -133,6 +136,13 @@ class Stepper implements MotorInterface {
     public function setDirection($direction){
         $this->direction = $direction;
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDirection(){
+        return $this->direction;
     }
 
     /**
@@ -146,12 +156,12 @@ class Stepper implements MotorInterface {
 
     public function forward() {
         return $this->setDirection(self::DIRECTION_FORWARD)
-            ->start();
+            ->restart();
     }
 
     public function reverse() {
         return $this->setDirection(self::DIRECTION_REVERSE)
-            ->start();
+            ->restart();
     }
 
     public function stop() {
@@ -197,6 +207,10 @@ class Stepper implements MotorInterface {
     }
 
 
+    public function restart(){
+        return $this->stop()->start();
+    }
+
     /**
      * Shift the pattern to the next phase
      * This really is write-only code!
@@ -208,7 +222,7 @@ class Stepper implements MotorInterface {
 
         //Preform a circular shift of the pattern in the appropriate direction
         //This is for the main pattern
-        if($this->direction){
+        if($this->direction === self::DIRECTION_FORWARD){
             $shifted = $this->mask << 1 | $this->mask >> ($this->phase_msb);
         } else {
             $shifted = $this->mask >> 1 | $this->mask << ($this->phase_msb);
