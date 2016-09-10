@@ -25,9 +25,9 @@ class Pin {
 
     const EVENT_FUNCTION_CHANGE = 'function.change';
 
-    const EVENT_LEVEL_CHANGE    = 'level.change';
-    const EVENT_HIGH            = 'level.high';
-    const EVENT_LOW             = 'level.low';
+    const EVENT_LEVEL_CHANGE = 'level.change';
+    const EVENT_LEVEL_HIGH   = 'level.high';
+    const EVENT_LEVEL_LOW    = 'level.low';
 
 
     /**
@@ -346,9 +346,9 @@ class Pin {
     public function onPinChangeEvent($level){
         //Mainly just connecting up events here
         if($level === self::LEVEL_HIGH){
-            $this->emit(self::EVENT_HIGH);
+            $this->emit(self::EVENT_LEVEL_HIGH);
         } elseif($level === self::LEVEL_LOW) {
-            $this->emit(self::EVENT_LOW);
+            $this->emit(self::EVENT_LEVEL_LOW);
         }
     }
 
