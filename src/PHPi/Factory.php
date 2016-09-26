@@ -54,15 +54,21 @@ class Factory {
             case '0009':
                 return new Board\V1\A($loop);
             case '0010':
+            case '0013':
                 return new Board\V1\BPlus($loop);
             case '0011':
+            case '0014':
                 return new Board\ComputeModule($loop);
             case '0012':
+            case '0015':
                 return new Board\V1\APlus($loop);
+            case 'a01040':
             case 'a01041':
             case 'a21041':
+            case 'a22042':
                 return new Board\V2\B($loop);
             case '900092':
+            case '900093':
                 return new Board\Zero($loop);
             case 'a02082':
             case 'a22082':
