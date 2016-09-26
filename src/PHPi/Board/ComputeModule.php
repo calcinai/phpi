@@ -14,4 +14,7 @@ class ComputeModule extends Board {
 
     use Feature\SoC\BCM2835;
 
+    public static function getBoardName() {
+        return 'Compute Module';
+    }
 }

@@ -19,4 +19,8 @@ class Mock extends Board {
         return [];
 
     }
+
+    public static function getBoardName() {
+        return 'Mock Board';
+    }
 }
