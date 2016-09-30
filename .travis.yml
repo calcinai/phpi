@@ -7,11 +7,11 @@ php:
 matrix:
   allow_failures:
   - php: hhvm
-  - php: 7
 before_script:
   - composer install
 after_success:
-  - tar -cvzf phpi.tar.gz
+  - composer install --no-dev
+  - tar -cvzf phpi.tar.gz .
 deploy:
   provider: releases
   api_key:
