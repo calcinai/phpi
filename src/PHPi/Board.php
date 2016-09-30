@@ -79,7 +79,6 @@ abstract class Board implements BoardInterface {
 
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
-        $this->edge_detector = EdgeDetector\Factory::create($this);
     }
 
     public function __destruct() {
@@ -197,6 +196,9 @@ abstract class Board implements BoardInterface {
 
 
     public function getEdgeDetector(){
+        if(!isset($this->edge_detector)){
+            $this->edge_detector = EdgeDetector\Factory::create($this);
+        }
         return $this->edge_detector;
     }
 
