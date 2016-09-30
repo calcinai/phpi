@@ -1,0 +1,22 @@
+language: php
+php:
+- 5.5
+- 5.6
+- hhvm
+- 7
+matrix:
+  allow_failures:
+  - php: hhvm
+  - php: 7
+before_script:
+  - composer install
+after_success:
+  - tar -cvzf phpi.tar.gz
+deploy:
+  provider: releases
+  api_key:
+    secure: YeE5lICt/mWlHFvmpvO4jfdPD3WMK7lR1z8s4Ai0ttGKRO5trRZZqZYIBQ+sc9iyp/e9NZLc0amHOSrRaSFG/V5rdwdnCi3gpEiX6VG8ZpTkkgbZSDYYg25P1irdaI6kJt2xPd1t5SvyhKhaxSG+gBF6noApZc9T66dlwulq+fifLcwTWRnC5f9+e7hSratuU0+wQvJ4BEmTBwU6lR+K6i4FC62U/Pt09xitdBwSNfLkjdFzpcvfUJTw7sGrvtxdLmvDQuX/HXP0xLSLGWRs4rZ7zeaTSQVcWX3X7ZLijVwngbSQ+mLhszo3hMlt+pPAEvLSE+upWSZ3fgyijqK15BuXdUeoC6otyUPBak71BUmQO62AbfsK9H88lLkpOjxloS7K+06W6WvQV+dDezOmF1RstvXhFCSmOkyHQl7Sgr1q9QtmXS0du8x4QdQCYGtsekEvEjh4UDVZrL20KNdpCvhvdDIBWQPO5sMBF5jYhLm+65D+vby1JU4o9lClhRRpVXIEnKzvIf3gpaWJ2wRVq4XPzv1+jDL87cOVLuBMNIvdlUWXCpjQbljdVZPDtP2+rp8VT3HCjm6J6O7OfI+vtjsahUjPEzzfmIvWUMQNp/NM3KZY8YsvWU3K5pFC03M7uuqDI4VoUhbpg1ox0eEAD+6TTsikZNlwi4YWjF9s0ug=
+  file: phpi.tar.gz
+  skip_cleanup: true
+  on:
+    tags: true
