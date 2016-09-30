@@ -1,5 +1,8 @@
 # PHPi
 
+[![Build Status](https://travis-ci.org/calcinai/phpi.svg?branch=master)](https://travis-ci.org/calcinai/phpi)
+[![Latest Stable Version](https://poser.pugx.org/calcinai/phpi/v/stable)](https://packagist.org/packages/calcinai/phpi)
+
 Event driven bindings for the Raspberry Pi GPIO. Supports A, A+, B, Brev2, B+, 2B, 3B, Compute Module and Pi Zero.
 
 This library interacts (almost) directly with the peripheral registers for maximum functionality and speed.  See note on `mmap/dma`
