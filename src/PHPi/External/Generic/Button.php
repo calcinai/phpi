@@ -62,7 +62,7 @@ class Button extends Input {
         });
 
 
-        $release_event = $this->active_high ? Pin::EVENT_LEVEL_LOW : Pin::EVENT_HIGH;
+        $release_event = $this->active_high ? Pin::EVENT_LEVEL_LOW : Pin::EVENT_LEVEL_HIGH;
 
         $this->pin->once($release_event, function() use(&$press_timer, &$hold_timer){
             $press_timer->cancel();
@@ -79,7 +79,7 @@ class Button extends Input {
         }
 
         //Do it like this so it can be hidden from userspace
-        $press_event = $this->active_high ? Pin::EVENT_HIGH : Pin::EVENT_LEVEL_LOW;
+        $press_event = $this->active_high ? Pin::EVENT_LEVEL_HIGH : Pin::EVENT_LEVEL_LOW;
         $this->pin->on($press_event, function(){ $this->onPinPressEvent(); });
     }
 
