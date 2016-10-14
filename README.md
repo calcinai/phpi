@@ -75,7 +75,8 @@ $board->getLoop()->run();
 
 GPIO (input) is the default mode of the pin objects. Alternate functions can be accessed by using the ```->setFunction(PinFunction::x)``` method.  It is
  recommended to use the function names as opposed to `ALT0..5` unless you know exactly what you're doing, as quite a lot are reserved.
-A few useful classes are also included for digital interaction.
+A few useful classes are also included for digital interaction.  With the default python-mmap, you can expect a raw transition speed of ~15kHz, with the
+native extension, it's more like 50kHz on a Pi 3.
 
 
 ### PWM

@@ -209,8 +209,11 @@ class Pin {
     }
 
 
-    public function high(){
-        $this->assertFunction([PinFunction::OUTPUT]);
+    public function high($fast_mode = false){
+
+        if(!$fast_mode){
+            $this->assertFunction([PinFunction::OUTPUT]);
+        }
 
         $this->setInternalLevel(self::LEVEL_HIGH);
 
@@ -220,8 +223,11 @@ class Pin {
         return $this;
     }
 
-    public function low(){
-        $this->assertFunction([PinFunction::OUTPUT]);
+    public function low($fast_mode = false){
+
+        if(!$fast_mode){
+            $this->assertFunction([PinFunction::OUTPUT]);
+        }
 
         $this->setInternalLevel(self::LEVEL_LOW);
 

@@ -9,6 +9,7 @@ namespace Calcinai\PHPi;
 
 use Calcinai\PHPi\Board\BoardInterface;
 use Calcinai\PHPi\Peripheral\Clock;
+use Calcinai\PHPi\Peripheral\I2C;
 use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Peripheral\SPI;
@@ -76,6 +77,11 @@ abstract class Board implements BoardInterface {
      */
     private $spis;
 
+    /**
+     * @var I2C[]
+     */
+    private $i2cs;
+
 
     public function __construct(LoopInterface $loop) {
         $this->loop = $loop;
@@ -136,6 +142,18 @@ abstract class Board implements BoardInterface {
         }
 
         return $this->spis[$spi_number];
+    }
+
+    /**
+     * @param $i2c_number
+     * @return SPI
+     */
+    public function getI2C($i2c_number){
+        if(!isset($this->i2cs[$i2c_number])){
+            $this->i2cs[$i2c_number] = new I2C($this, $i2c_number);
+        }
+
+        return $this->i2cs[$i2c_number];
     }
 
     /**
