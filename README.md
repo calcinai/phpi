@@ -109,4 +109,3 @@ There are included helper classes for interfacing with common devices, with more
 * ADC (MCP 3xxx series)
 * H Bridge Motors
 * 2 and 4 Phase stepper motors
-
