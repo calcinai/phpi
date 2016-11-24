@@ -209,10 +209,19 @@ class Pin {
     }
 
 
-    public function high(){
-        $this->assertFunction([PinFunction::OUTPUT]);
+    /**
+     * Raw pin transition with fast mode, fast mode ignores all checks and event emitters
+     *
+     * @param bool $fast_mode
+     * @return $this
+     * @throws InvalidPinFunctionException
+     */
+    public function high($fast_mode = false){
 
-        $this->setInternalLevel(self::LEVEL_HIGH);
+        if(!$fast_mode){
+            $this->assertFunction([PinFunction::OUTPUT]);
+            $this->setInternalLevel(self::LEVEL_HIGH);
+        }
 
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPSET[$bank]] = $mask;
@@ -220,10 +229,19 @@ class Pin {
         return $this;
     }
 
-    public function low(){
-        $this->assertFunction([PinFunction::OUTPUT]);
+    /**
+     * Raw pin transition with fast mode, fast mode ignores all checks and event emitters
+     *
+     * @param bool $fast_mode
+     * @return $this
+     * @throws InvalidPinFunctionException
+     */
+    public function low($fast_mode = false){
 
-        $this->setInternalLevel(self::LEVEL_LOW);
+        if(!$fast_mode){
+            $this->assertFunction([PinFunction::OUTPUT]);
+            $this->setInternalLevel(self::LEVEL_LOW);
+        }
 
         list($bank, $mask) = $this->getAddressMask();
         $this->gpio_register[Register\GPIO::$GPCLR[$bank]] = $mask;
