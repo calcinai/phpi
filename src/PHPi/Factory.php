@@ -12,7 +12,8 @@ use Calcinai\PHPi\Exception\UnsupportedBoardException;
 use React\EventLoop\Factory as LoopFactory;
 use React\EventLoop\LoopInterface;
 
-class Factory {
+class Factory
+{
 
     /**
      * This is a little messy now sto allow for php 5.4 (no ::class magic)
@@ -21,16 +22,17 @@ class Factory {
      * @return \Calcinai\PHPi\Board
      * @throws UnsupportedBoardException
      */
-    public static function create(LoopInterface $loop = null) {
+    public static function create(LoopInterface $loop = null)
+    {
 
-        if($loop === null){
+        if ($loop === null) {
             $loop = LoopFactory::create();
         }
 
         $cpuinfo_file = '/proc/cpuinfo';
         $cpuinfo_pattern = '/Hardware\s+:\s(?<soc>.+)\nRevision\s+:\s(?<revision>.+)/';
 
-        if(!file_exists($cpuinfo_file) || !preg_match($cpuinfo_pattern, file_get_contents($cpuinfo_file), $matches)){
+        if (!file_exists($cpuinfo_file) || !preg_match($cpuinfo_pattern, file_get_contents($cpuinfo_file), $matches)) {
             //No matches for revision - probably generic Unix
             return new Board\Mock($loop);
         }
@@ -38,7 +40,7 @@ class Factory {
         $soc = $matches['soc'];
         $revision = $matches['revision'];
 
-        switch($revision){
+        switch ($revision) {
             case '0002':
             case '0003':
                 return new Board\V1\B($loop);
