@@ -30,32 +30,32 @@ abstract class Board implements BoardInterface {
      *
      * Register for gpio functions
      */
-    private $gpio_register;
+    protected $gpio_register;
 
     /**
      * @var Register\PWM
      */
-    private $pwm_register;
+    protected $pwm_register;
 
     /**
      * @var Register\Clock
      */
-    private $clock_register;
+    protected $clock_register;
 
     /**
      * @var Register\SPI
      */
-    private $spi_register;
+    protected $spi_register;
 
     /**
      * @var Register\Auxiliary
      */
-    private $aux_register;
+    protected $aux_register;
 
     /**
      * @var EdgeDetector\EdgeDetectorInterface
      */
-    private $edge_detector;
+    protected $edge_detector;
 
     /**
      * @var Pin[]
