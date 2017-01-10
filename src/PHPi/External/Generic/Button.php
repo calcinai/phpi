@@ -72,7 +72,7 @@ class Button extends Input {
         });
     }
 
-    public function eventListenerAdded(){
+    public function eventListenerAdded($event_name){
         //Only interested in the first event added, no advantage to only firing the onces that are being listened to
         if($this->countListeners() !== 1){
             return;
