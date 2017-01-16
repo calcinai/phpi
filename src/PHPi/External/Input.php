@@ -10,22 +10,25 @@ namespace Calcinai\PHPi\External;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Traits\EventEmitterTrait;
 
-class Input {
+class Input
+{
 
     use EventEmitterTrait;
 
     protected $pin;
 
-    public function __construct(Pin $pin){
+    public function __construct(Pin $pin)
+    {
         $this->pin = $pin;
 
         $pin->setFunction(Pin\PinFunction::INPUT);
     }
 
 
-    public function eventListenerRemoved(){
+    public function eventListenerRemoved()
+    {
         //Only interested in the last event removed
-        if($this->countListeners() !== 0){
+        if ($this->countListeners() !== 0) {
             return;
         }
         $this->pin->removeAllListeners();

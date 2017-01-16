@@ -8,9 +8,11 @@ namespace Calcinai\PHPi\Peripheral;
 
 use Calcinai\PHPi\Board;
 
-class I2C extends AbstractPeripheral {
+class I2C extends AbstractPeripheral
+{
 
-    public function __construct(Board $board) {
+    public function __construct(Board $board)
+    {
         throw new \Exception('I2C not implemented');
     }
 

@@ -8,9 +8,11 @@ namespace Calcinai\PHPi\Pin\EdgeDetector;
 
 use Calcinai\PHPi\Board;
 
-class Factory {
+class Factory
+{
 
-    public static function create(Board $board){
+    public static function create(Board $board)
+    {
         //It isn't working correctly yet.
         if (false && Rubberneck::isSuitable()) {
             return new Rubberneck($board);

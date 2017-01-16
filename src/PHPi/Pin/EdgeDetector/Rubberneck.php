@@ -12,7 +12,8 @@ use Calcinai\PHPi\Pin\SysFS;
 use Calcinai\Rubberneck\Driver\InotifyWait;
 use Calcinai\Rubberneck\Observer;
 
-class Rubberneck implements EdgeDetectorInterface {
+class Rubberneck implements EdgeDetectorInterface
+{
 
     private $board;
     private $observer;
@@ -22,7 +23,8 @@ class Rubberneck implements EdgeDetectorInterface {
      */
     private $pins;
 
-    public function __construct(Board $board) {
+    public function __construct(Board $board)
+    {
 
         $this->board = $board;
         $this->pins = [];
@@ -35,7 +37,8 @@ class Rubberneck implements EdgeDetectorInterface {
     }
 
 
-    public function addPin(Pin $pin) {
+    public function addPin(Pin $pin)
+    {
         SysFS::exportPin($pin);
         SysFS::setEdge($pin, self::EDGE_BOTH);
 
@@ -43,15 +46,17 @@ class Rubberneck implements EdgeDetectorInterface {
 
     }
 
-    public function removePin(Pin $pin) {
+    public function removePin(Pin $pin)
+    {
         SysFS::unexportPin($pin);
 
         // TODO: Implement removePin() method.
     }
 
 
-    public function eventDetect($file){
-        list($pin_number) = sscanf($file, SysFS::PATH_BASE.'/gpio%i/');
+    public function eventDetect($file)
+    {
+        list($pin_number) = sscanf($file, SysFS::PATH_BASE . '/gpio%i/');
 
         $pin = $this->pins[$pin_number];
 
@@ -65,14 +70,13 @@ class Rubberneck implements EdgeDetectorInterface {
     }
 
 
-
-
     /**
      * Only use rubberneck if it can use Inotify, as the sysfs file poll is goign to be slower than the ED SR
      *
      * @return bool
      */
-    public static function isSuitable() {
+    public static function isSuitable()
+    {
         return InotifyWait::hasDependencies();
     }
 }

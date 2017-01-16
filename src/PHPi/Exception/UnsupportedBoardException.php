@@ -6,6 +6,7 @@
 
 namespace Calcinai\PHPi\Exception;
 
-class UnsupportedBoardException extends \Exception {
+class UnsupportedBoardException extends \Exception
+{
 
 }

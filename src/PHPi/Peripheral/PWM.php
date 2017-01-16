@@ -14,8 +14,8 @@ class PWM extends AbstractPeripheral
 {
 
     const DEFAULT_DUTY_CYCLE = 50;
-    const DEFAULT_FREQUENCY = 1000;
-    const DEFAULT_RANGE = 1024;
+    const DEFAULT_FREQUENCY  = 1000;
+    const DEFAULT_RANGE      = 1024;
 
     const PWM0 = 0;
     const PWM1 = 1;

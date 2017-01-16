@@ -10,7 +10,8 @@ namespace Calcinai\PHPi\Peripheral;
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
 
-class Clock extends AbstractPeripheral {
+class Clock extends AbstractPeripheral
+{
 
     private $clock_register;
 
@@ -19,11 +20,11 @@ class Clock extends AbstractPeripheral {
 
     const MIN_FREQUENCY = 0.0001;
 
-    const GP0   = 0;
-    const GP1   = 1;
-    const GP2   = 2;
-    const PCM   = 3;
-    const PWM   = 4;
+    const GP0 = 0;
+    const GP1 = 1;
+    const GP2 = 2;
+    const PCM = 3;
+    const PWM = 4;
 
     static $CTL = [
         self::GP0 => Register\Clock::GP0_CTL,
@@ -50,7 +51,8 @@ class Clock extends AbstractPeripheral {
         Register\Clock::SRC_HDMI => 216e6, //216MHz
     ];
 
-    public function __construct(Board $board, $clock_number) {
+    public function __construct(Board $board, $clock_number)
+    {
         $this->board = $board;
         $this->clock_register = $this->board->getClockRegister();
 
@@ -64,15 +66,16 @@ class Clock extends AbstractPeripheral {
      * @return $this
      * @throws InvalidValueException
      */
-    public function start($frequency, $src = Register\Clock::SRC_OSC) {
+    public function start($frequency, $src = Register\Clock::SRC_OSC)
+    {
 
-        if(!isset(static::$CLOCK_FREQUENCIES[$src])){
+        if (!isset(static::$CLOCK_FREQUENCIES[$src])) {
             throw new InvalidValueException(sprintf('Invalid clock source'));
         }
 
         $base_frequency = static::$CLOCK_FREQUENCIES[$src];
 
-        if($frequency < self::MIN_FREQUENCY || $frequency > $base_frequency){
+        if ($frequency < self::MIN_FREQUENCY || $frequency > $base_frequency) {
             throw new InvalidValueException(sprintf('Frequency must be between %s and %s', self::MIN_FREQUENCY, $base_frequency));
         }
 
@@ -97,13 +100,14 @@ class Clock extends AbstractPeripheral {
     /**
      * @return $this
      */
-    public function stop() {
+    public function stop()
+    {
 
         $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
         usleep(110);
 
         //Wait for not busy
-        while(($this->clock_register[$this->ctl] & Register\Clock::BUSY) != 0) {
+        while (($this->clock_register[$this->ctl] & Register\Clock::BUSY) != 0) {
             usleep(10);
         }
 

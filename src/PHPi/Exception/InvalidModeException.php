@@ -6,6 +6,7 @@
 
 namespace Calcinai\PHPi\Exception;
 
-class InvalidModeException extends \Exception {
+class InvalidModeException extends \Exception
+{
 
 }

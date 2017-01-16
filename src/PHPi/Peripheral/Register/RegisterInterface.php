@@ -7,6 +7,7 @@
 namespace Calcinai\PHPi\Peripheral\Register;
 
 
-interface RegisterInterface {
+interface RegisterInterface
+{
     public static function getOffset();
 }

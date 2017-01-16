@@ -15,10 +15,10 @@ use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Peripheral\SPI;
 use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\EdgeDetector;
-
 use React\EventLoop\LoopInterface;
 
-abstract class Board implements BoardInterface {
+abstract class Board implements BoardInterface
+{
 
     /**
      * @var \React\EventLoop\LibEvLoop|LoopInterface
@@ -83,15 +83,18 @@ abstract class Board implements BoardInterface {
     private $i2cs;
 
 
-    public function __construct(LoopInterface $loop) {
+    public function __construct(LoopInterface $loop)
+    {
         $this->loop = $loop;
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         Pin\SysFS::cleanup();
     }
 
-    public function getLoop(){
+    public function getLoop()
+    {
         return $this->loop;
     }
 
@@ -99,9 +102,10 @@ abstract class Board implements BoardInterface {
      * @param $pin_number
      * @return Pin
      */
-    public function getPin($pin_number){
+    public function getPin($pin_number)
+    {
 
-        if(!isset($this->pins[$pin_number])){
+        if (!isset($this->pins[$pin_number])) {
             $this->pins[$pin_number] = new Pin($this, $pin_number);
         }
 
@@ -112,8 +116,9 @@ abstract class Board implements BoardInterface {
      * @param $pwm_number
      * @return PWM
      */
-    public function getPWM($pwm_number){
-        if(!isset($this->pwms[$pwm_number])){
+    public function getPWM($pwm_number)
+    {
+        if (!isset($this->pwms[$pwm_number])) {
             $this->pwms[$pwm_number] = new PWM($this, $pwm_number);
         }
 
@@ -124,8 +129,9 @@ abstract class Board implements BoardInterface {
      * @param $clock_number
      * @return Clock
      */
-    public function getClock($clock_number){
-        if(!isset($this->clocks[$clock_number])){
+    public function getClock($clock_number)
+    {
+        if (!isset($this->clocks[$clock_number])) {
             $this->clocks[$clock_number] = new Clock($this, $clock_number);
         }
 
@@ -136,8 +142,9 @@ abstract class Board implements BoardInterface {
      * @param $spi_number
      * @return SPI
      */
-    public function getSPI($spi_number){
-        if(!isset($this->spis[$spi_number])){
+    public function getSPI($spi_number)
+    {
+        if (!isset($this->spis[$spi_number])) {
             $this->spis[$spi_number] = new SPI($this, $spi_number);
         }
 
@@ -148,8 +155,9 @@ abstract class Board implements BoardInterface {
      * @param $i2c_number
      * @return SPI
      */
-    public function getI2C($i2c_number){
-        if(!isset($this->i2cs[$i2c_number])){
+    public function getI2C($i2c_number)
+    {
+        if (!isset($this->i2cs[$i2c_number])) {
             $this->i2cs[$i2c_number] = new I2C($this, $i2c_number);
         }
 
@@ -159,8 +167,9 @@ abstract class Board implements BoardInterface {
     /**
      * @return Register\GPIO
      */
-    public function getGPIORegister() {
-        if(!isset($this->gpio_register)){
+    public function getGPIORegister()
+    {
+        if (!isset($this->gpio_register)) {
             $this->gpio_register = new Register\GPIO($this);
         }
 
@@ -170,8 +179,9 @@ abstract class Board implements BoardInterface {
     /**
      * @return Register\PWM
      */
-    public function getPWMRegister() {
-        if(!isset($this->pwm_register)){
+    public function getPWMRegister()
+    {
+        if (!isset($this->pwm_register)) {
             $this->pwm_register = new Register\PWM($this);
         }
 
@@ -181,8 +191,9 @@ abstract class Board implements BoardInterface {
     /**
      * @return Register\Clock
      */
-    public function getClockRegister() {
-        if(!isset($this->clock_register)){
+    public function getClockRegister()
+    {
+        if (!isset($this->clock_register)) {
             $this->clock_register = new Register\Clock($this);
         }
 
@@ -192,8 +203,9 @@ abstract class Board implements BoardInterface {
     /**
      * @return Register\Auxiliary
      */
-    public function getAuxRegister() {
-        if(!isset($this->aux_register)){
+    public function getAuxRegister()
+    {
+        if (!isset($this->aux_register)) {
             $this->aux_register = new Register\Auxiliary($this);
         }
 
@@ -203,8 +215,9 @@ abstract class Board implements BoardInterface {
     /**
      * @return Register\SPI
      */
-    public function getSPIRegister() {
-        if(!isset($this->spi_register)){
+    public function getSPIRegister()
+    {
+        if (!isset($this->spi_register)) {
             $this->spi_register = new Register\SPI($this);
         }
 
@@ -212,9 +225,9 @@ abstract class Board implements BoardInterface {
     }
 
 
-
-    public function getEdgeDetector(){
-        if(!isset($this->edge_detector)){
+    public function getEdgeDetector()
+    {
+        if (!isset($this->edge_detector)) {
             $this->edge_detector = EdgeDetector\Factory::create($this);
         }
         return $this->edge_detector;
@@ -223,7 +236,8 @@ abstract class Board implements BoardInterface {
     /**
      * Should be overloaded by frature trait
      */
-    public function getPhysicalPins() {
+    public function getPhysicalPins()
+    {
         return [];
     }
 
@@ -233,23 +247,24 @@ abstract class Board implements BoardInterface {
      *
      * @return \stdClass
      */
-    public static function getMeta(){
+    public static function getMeta()
+    {
 
         $meta = new \stdClass();
 
         //Get a whole lot of stuff - parsing them is the same.
-        $info = file_get_contents('/proc/cpuinfo').`lscpu`;
+        $info = file_get_contents('/proc/cpuinfo') . `lscpu`;
 
         $meta->serial = 'unknown';
         $meta->speed = 0;
         $meta->cpu = 'unknown';
         $meta->num_cores = 0;
 
-        foreach(explode("\n", $info) as $line) {
+        foreach (explode("\n", $info) as $line) {
             //null,null avoid undefined offset.
             list($tag, $value) = explode(':', $line, 2) + [null, null];
 
-            switch(strtolower(trim($tag))){
+            switch (strtolower(trim($tag))) {
                 case 'revision':
                     $meta->revision = trim($value);
                     break;

@@ -7,7 +7,8 @@
 
 namespace Calcinai\PHPi\Peripheral\Register;
 
-class Clock extends AbstractRegister {
+class Clock extends AbstractRegister
+{
 
     const GP0_CTL = 0x1c; //0b0011100
     const GP0_DIV = 0x1d; //0b0011101
@@ -25,23 +26,24 @@ class Clock extends AbstractRegister {
     const PWM_DIV = 0x29; //0b0101001
 
 
-    const FLIP  = 0x100;
-    const BUSY  = 0x080;
-    const KILL  = 0x020;
-    const ENAB  = 0x010;
+    const FLIP = 0x100;
+    const BUSY = 0x080;
+    const KILL = 0x020;
+    const ENAB = 0x010;
 
     const SRC_MASK = 0xf;
 
-    const SRC_GND    = 0x0;
-    const SRC_OSC    = 0x1;
-    const SRC_TEST0  = 0x2;
-    const SRC_TEST1  = 0x3;
-    const SRC_PLLA   = 0x4;
-    const SRC_PLLC   = 0x5;
-    const SRC_PLLD   = 0x6;
-    const SRC_HDMI   = 0x7;
+    const SRC_GND   = 0x0;
+    const SRC_OSC   = 0x1;
+    const SRC_TEST0 = 0x2;
+    const SRC_TEST1 = 0x3;
+    const SRC_PLLA  = 0x4;
+    const SRC_PLLC  = 0x5;
+    const SRC_PLLD  = 0x6;
+    const SRC_HDMI  = 0x7;
 
-    public static function getOffset() {
+    public static function getOffset()
+    {
         return 0x101000;
     }
 

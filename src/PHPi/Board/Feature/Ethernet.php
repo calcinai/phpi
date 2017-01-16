@@ -7,6 +7,7 @@
 
 namespace Calcinai\PHPi\Board\Feature;
 
-trait Ethernet {
+trait Ethernet
+{
 
 }

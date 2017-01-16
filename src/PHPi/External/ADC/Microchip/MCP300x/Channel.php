@@ -11,7 +11,8 @@ use Calcinai\PHPi\External\ADC\Microchip\MCP300x;
 use Calcinai\PHPi\Traits\EventEmitterTrait;
 use React\EventLoop\Timer\TimerInterface;
 
-class Channel {
+class Channel
+{
 
     use EventEmitterTrait;
 
@@ -20,7 +21,7 @@ class Channel {
 
     const DEFAULT_UPDATE_INTERVAL = 0.04; //25Hz
 
-    const EVENT_CHANGE   = 'change';
+    const EVENT_CHANGE = 'change';
 
     /**
      * @var MCP300x
@@ -36,7 +37,8 @@ class Channel {
 
     private $internal_value;
 
-    public function __construct(MCP300x $adc, $channel_number) {
+    public function __construct(MCP300x $adc, $channel_number)
+    {
 
         $this->adc = $adc;
         $this->channel_number = $channel_number;
@@ -50,7 +52,8 @@ class Channel {
      *
      * @return int
      */
-    public function read(){
+    public function read()
+    {
 
         $channel_bits = $this->mode << 7 | ($this->channel_number << 4);
 
@@ -63,7 +66,7 @@ class Channel {
 
         $value = (($read['msb'] << 8) | $read['lsb']) & $output_mask;
 
-        if($this->internal_value !== null && $value !== $this->internal_value){
+        if ($this->internal_value !== null && $value !== $this->internal_value) {
             $this->emit(self::EVENT_CHANGE, [$value, $this->internal_value]);
         }
 
@@ -74,17 +77,19 @@ class Channel {
 
 
     //Meta events for setting up polling
-    public function eventListenerAdded(){
+    public function eventListenerAdded()
+    {
         //If it's the first event
-        if($this->countListeners(self::EVENT_CHANGE) === 1) {
+        if ($this->countListeners(self::EVENT_CHANGE) === 1) {
             $this->poll_timer = $this->adc->getSPI()->getBoard()->getLoop()->addPeriodicTimer(self::DEFAULT_UPDATE_INTERVAL, [$this, 'read']);
         }
     }
 
 
-    public function eventListenerRemoved(){
+    public function eventListenerRemoved()
+    {
         //If it's the last event
-        if($this->countListeners(self::EVENT_CHANGE) === 0) {
+        if ($this->countListeners(self::EVENT_CHANGE) === 0) {
             $this->poll_timer->cancel();
         }
     }

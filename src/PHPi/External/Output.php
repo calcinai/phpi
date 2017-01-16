@@ -9,7 +9,8 @@ namespace Calcinai\PHPi\External;
 use Calcinai\PHPi\Pin;
 use React\EventLoop\Timer\TimerInterface;
 
-class Output {
+class Output
+{
 
     /**
      * @var Pin
@@ -21,7 +22,8 @@ class Output {
      */
     protected $active_high;
 
-    public function __construct(Pin $pin, $active_high = true){
+    public function __construct(Pin $pin, $active_high = true)
+    {
         $this->pin = $pin;
         $this->active_high = $active_high;
 
@@ -29,20 +31,24 @@ class Output {
     }
 
 
-    public function on(){
+    public function on()
+    {
         $this->active_high ? $this->pin->high() : $this->pin->low();
     }
 
-    public function off(){
+    public function off()
+    {
         $this->active_high ? $this->pin->low() : $this->pin->high();
     }
 
-    public function toggle(){
+    public function toggle()
+    {
         //This will still work if active low
         $this->pin->getLevel() === Pin::LEVEL_HIGH ? $this->pin->low() : $this->pin->high();
     }
 
-    public function pulse($iterations = null, $interval = 1, $duty = 0.5){
+    public function pulse($iterations = null, $interval = 1, $duty = 0.5)
+    {
 
         $this->on();
 
@@ -50,9 +56,9 @@ class Output {
 
         $this->pin->getBoard()
             ->getLoop()->addTimer($on_time, [$this, 'off'])
-            ->getLoop()->addPeriodicTimer($interval, function(TimerInterface $timer) use(&$iterations, $on_time) {
+            ->getLoop()->addPeriodicTimer($interval, function (TimerInterface $timer) use (&$iterations, $on_time) {
 
-                if($iterations !== null && --$iterations === 0){
+                if ($iterations !== null && --$iterations === 0) {
                     $timer->cancel();
                     return;
                 }

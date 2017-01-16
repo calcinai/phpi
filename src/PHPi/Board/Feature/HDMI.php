@@ -7,6 +7,7 @@
 
 namespace Calcinai\PHPi\Board\Feature;
 
-trait HDMI {
+trait HDMI
+{
 
 }

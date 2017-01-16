@@ -9,7 +9,8 @@ namespace Calcinai\PHPi\Peripheral\Register;
 
 use Calcinai\PHPi\Pin;
 
-class GPIO extends AbstractRegister {
+class GPIO extends AbstractRegister
+{
 
     const GPFSEL0   = 0x0000; // GPIO Function Select 0 (R/W)
     const GPFSEL1   = 0x0004; // GPIO Function Select 1 (R/W)
@@ -53,11 +54,13 @@ class GPIO extends AbstractRegister {
 
     static $GPPUDCLK = [self::GPPUDCLK0, self::GPPUDCLK1];
 
-    public static function getOffset() {
+    public static function getOffset()
+    {
         return 0x200000;
     }
 
-    public static function getDirectMemoryFile() {
+    public static function getDirectMemoryFile()
+    {
         return '/dev/gpiomem';
     }
 

@@ -10,11 +10,13 @@
  */
 namespace Calcinai\PHPi\Traits;
 
-trait EventEmitterTrait {
+trait EventEmitterTrait
+{
 
     protected $listeners;
 
-    public function on($event, callable $listener){
+    public function on($event, callable $listener)
+    {
         if (!isset($this->listeners[$event])) {
             $this->listeners[$event] = [];
         }
@@ -23,9 +25,10 @@ trait EventEmitterTrait {
         $this->eventListenerAdded($event);
     }
 
-    public function once($event, callable $listener){
+    public function once($event, callable $listener)
+    {
 
-        $onceListener = function() use (&$onceListener, $event, $listener) {
+        $onceListener = function () use (&$onceListener, $event, $listener) {
             $this->removeListener($event, $onceListener);
 
             call_user_func_array($listener, func_get_args());
@@ -34,7 +37,8 @@ trait EventEmitterTrait {
         $this->on($event, $onceListener);
     }
 
-    public function removeListener($event, callable $listener){
+    public function removeListener($event, callable $listener)
+    {
         if (isset($this->listeners[$event])) {
             if (false !== $index = array_search($listener, $this->listeners[$event], true)) {
                 unset($this->listeners[$event][$index]);
@@ -44,35 +48,39 @@ trait EventEmitterTrait {
 
     }
 
-    public function removeAllListeners($event = null){
+    public function removeAllListeners($event = null)
+    {
         if ($event !== null) {
-            foreach($this->listeners($event) as $listener){
+            foreach ($this->listeners($event) as $listener) {
                 $this->removeListener($event, $listener);
             }
         } else {
-            foreach(array_keys($this->listeners) as $event){
+            foreach (array_keys($this->listeners) as $event) {
                 $this->removeAllListeners($event);
             }
         }
     }
 
-    public function listeners($event){
+    public function listeners($event)
+    {
         return isset($this->listeners[$event]) ? $this->listeners[$event] : [];
     }
 
-    public function countListeners($event = null){
+    public function countListeners($event = null)
+    {
         if ($event !== null) {
             return count($this->listeners[$event]);
         } else {
             $num_listeners = 0;
-            foreach(array_keys($this->listeners) as $event){
+            foreach (array_keys($this->listeners) as $event) {
                 $num_listeners += count($this->listeners[$event]);
             }
             return $num_listeners;
         }
     }
 
-    public function emit($event, array $arguments = []){
+    public function emit($event, array $arguments = [])
+    {
 
         foreach ($this->listeners($event) as $listener) {
             call_user_func_array($listener, $arguments);
@@ -85,12 +93,16 @@ trait EventEmitterTrait {
      *
      * @param $event_name
      */
-    public function eventListenerAdded($event_name){}
+    public function eventListenerAdded($event_name)
+    {
+    }
 
     /**
      * @param $event_name
      */
-    public function eventListenerRemoved($event_name){}
+    public function eventListenerRemoved($event_name)
+    {
+    }
 
 
 }

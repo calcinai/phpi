@@ -11,7 +11,8 @@ use Calcinai\PHPi\Exception\InvalidChannelException;
 use Calcinai\PHPi\External\ADC\Microchip\MCP300x\Channel;
 use Calcinai\PHPi\Peripheral\SPI;
 
-abstract class MCP300x {
+abstract class MCP300x
+{
 
     const DEFAULT_CLOCK_SPEED = 1e6; //1MHz
 
@@ -29,14 +30,15 @@ abstract class MCP300x {
      * @param SPI $spi
      * @param $spi_channel
      */
-    public function __construct(SPI $spi, $spi_channel) {
+    public function __construct(SPI $spi, $spi_channel)
+    {
 
         $this->spi = $spi;
         $this->spi->setClockSpeed(self::DEFAULT_CLOCK_SPEED);
 
         $this->spi_channel = $spi_channel;
 
-        for($channel_number = 0; $channel_number < $this->getNumChannels(); $channel_number++){
+        for ($channel_number = 0; $channel_number < $this->getNumChannels(); $channel_number++) {
             $this->channels[$channel_number] = new Channel($this, $channel_number);
         }
     }
@@ -44,7 +46,8 @@ abstract class MCP300x {
     /**
      * @return SPI
      */
-    public function getSPI() {
+    public function getSPI()
+    {
         return $this->spi;
     }
 
@@ -53,9 +56,10 @@ abstract class MCP300x {
      * @return Channel
      * @throws InvalidChannelException
      */
-    public function getChannel($channel_number){
+    public function getChannel($channel_number)
+    {
 
-        if(!isset($this->channels[$channel_number])){
+        if (!isset($this->channels[$channel_number])) {
             throw new InvalidChannelException(sprintf('Channel %s out of range for this ADC', $channel_number));
         }
 
@@ -66,7 +70,8 @@ abstract class MCP300x {
      * @param $buffer
      * @return string
      */
-    public function transfer($buffer) {
+    public function transfer($buffer)
+    {
         return $this->spi->transfer($buffer, $this->spi_channel);
     }
 

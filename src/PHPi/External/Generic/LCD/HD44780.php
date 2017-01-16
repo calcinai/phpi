@@ -7,6 +7,7 @@
 
 namespace Calcinai\PHPi\External\Generic\LCD;
 
-class HD44780 {
+class HD44780
+{
 
 }

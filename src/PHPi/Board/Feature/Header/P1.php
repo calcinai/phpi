@@ -6,9 +6,11 @@
  */
 namespace Calcinai\PHPi\Board\Feature\Header;
 
-trait P1 {
+trait P1
+{
 
-    public function getPhysicalPins(){
+    public function getPhysicalPins()
+    {
         return [
             'P1' => [
                 //Indexed from real numbers (header starts numbering at 1)

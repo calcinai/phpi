@@ -8,10 +8,11 @@
 namespace Calcinai\PHPi\Board;
 
 use Calcinai\PHPi\Board;
-use React\EventLoop\LoopInterface;
 use Calcinai\PHPi\Peripheral\Register;
+use React\EventLoop\LoopInterface;
 
-class Mock extends Board {
+class Mock extends Board
+{
 
     public function __construct(LoopInterface $loop)
     {
@@ -25,16 +26,19 @@ class Mock extends Board {
 
     }
 
-    public static function getPeripheralBaseAddress() {
+    public static function getPeripheralBaseAddress()
+    {
         return 0;
     }
 
-    public static function getPinFunctionMatrix() {
+    public static function getPinFunctionMatrix()
+    {
         return [];
 
     }
 
-    public static function getBoardName() {
+    public static function getBoardName()
+    {
         return 'Mock Board';
     }
 }

@@ -7,14 +7,15 @@
 namespace Calcinai\PHPi\Peripheral\Register;
 
 
-class SPI extends AbstractRegister implements RegisterInterface {
+class SPI extends AbstractRegister implements RegisterInterface
+{
 
-    const CS    = 0x0000;  //SPI Master Control and Status
-    const FIFO  = 0x0004;  //SPI Master TX and RX FIFOs
-    const CLK   = 0x0008;  //SPI Master Clock Divider
-    const DLEN  = 0x000c;  //SPI Master Data Length
-    const LTOH  = 0x0010;  //SPI LOSSI mode TOH
-    const DC    = 0x0014;  //SPI DMA DREQ Controls
+    const CS   = 0x0000;  //SPI Master Control and Status
+    const FIFO = 0x0004;  //SPI Master TX and RX FIFOs
+    const CLK  = 0x0008;  //SPI Master Clock Divider
+    const DLEN = 0x000c;  //SPI Master Data Length
+    const LTOH = 0x0010;  //SPI LOSSI mode TOH
+    const DC   = 0x0014;  //SPI DMA DREQ Controls
 
     const CS_LEN_LONG = 0x02000000;  //Enable Long data word in Lossi mode if DMA_LEN is set
     const CS_DMA_LEN  = 0x01000000;  //Enable DMA mode in Lossi mode
@@ -44,7 +45,8 @@ class SPI extends AbstractRegister implements RegisterInterface {
     const CS_CS       = 0x00000003;  //Chip Select
 
 
-    public static function getOffset() {
+    public static function getOffset()
+    {
         return 0x204000;
     }
 }

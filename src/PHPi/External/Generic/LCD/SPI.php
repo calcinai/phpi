@@ -7,6 +7,7 @@
 namespace Calcinai\PHPi\External\Generic\LCD;
 
 
-class SPI {
+class SPI
+{
 
 }

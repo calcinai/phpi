@@ -5,6 +5,7 @@
  */
 
 namespace Calcinai\PHPi\Peripheral\Register;
+
 use Calcinai\PHPi\Board\BoardInterface;
 
 /**

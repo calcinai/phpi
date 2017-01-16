@@ -6,21 +6,23 @@
 
 namespace Calcinai\PHPi\Board\Feature\SoC;
 
-use Calcinai\PHPi\Pin\PinFunction AS PF;
+use Calcinai\PHPi\Pin\PinFunction as PF;
 
-trait BCM2835 {
-    public static function getPinFunctionMatrix(){
+trait BCM2835
+{
+    public static function getPinFunctionMatrix()
+    {
         return [
-            0 =>  [PF::SDA0 => PF::ALT0],
-            1 =>  [PF::SCL0 => PF::ALT0],
-            2 =>  [PF::SDA1 => PF::ALT0],
-            3 =>  [PF::SCL1 => PF::ALT0],
-            4 =>  [PF::GPCLK0 => PF::ALT0, PF::ARM_TDI => PF::ALT5],
-            5 =>  [PF::GPCLK1 => PF::ALT0, PF::ARM_TDO => PF::ALT5],
-            6 =>  [PF::GPCLK2 => PF::ALT0, PF::ARM_RTCK => PF::ALT5],
-            7 =>  [PF::SPI0_CE1_N => PF::ALT0],
-            8 =>  [PF::SPI0_CE0_N => PF::ALT0],
-            9 =>  [PF::SPI0_MISO => PF::ALT0],
+            0 => [PF::SDA0 => PF::ALT0],
+            1 => [PF::SCL0 => PF::ALT0],
+            2 => [PF::SDA1 => PF::ALT0],
+            3 => [PF::SCL1 => PF::ALT0],
+            4 => [PF::GPCLK0 => PF::ALT0, PF::ARM_TDI => PF::ALT5],
+            5 => [PF::GPCLK1 => PF::ALT0, PF::ARM_TDO => PF::ALT5],
+            6 => [PF::GPCLK2 => PF::ALT0, PF::ARM_RTCK => PF::ALT5],
+            7 => [PF::SPI0_CE1_N => PF::ALT0],
+            8 => [PF::SPI0_CE0_N => PF::ALT0],
+            9 => [PF::SPI0_MISO => PF::ALT0],
             10 => [PF::SPI0_MOSI => PF::ALT0],
             11 => [PF::SPI0_SCLK => PF::ALT0],
             12 => [PF::PWM0 => PF::ALT0, PF::ARM_TMS => PF::ALT5],
@@ -68,7 +70,8 @@ trait BCM2835 {
         ];
     }
 
-    public static function getPeripheralBaseAddress(){
+    public static function getPeripheralBaseAddress()
+    {
         return 0x20000000;
     }
 }

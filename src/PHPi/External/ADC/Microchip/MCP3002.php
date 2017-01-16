@@ -12,10 +12,12 @@ namespace Calcinai\PHPi\External\ADC\Microchip;
  * Class MCP3002
  * @package Calcinai\PHPi\External\ADC\Microchip
  */
-class MCP3002 extends MCP300x {
+class MCP3002 extends MCP300x
+{
 
 
-    public function getNumChannels() {
+    public function getNumChannels()
+    {
         return 2;
     }
 }

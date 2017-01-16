@@ -6,9 +6,11 @@
  */
 namespace Calcinai\PHPi\External\ADC\Microchip;
 
-class MCP3004 extends MCP300x {
+class MCP3004 extends MCP300x
+{
 
-    public function getNumChannels() {
+    public function getNumChannels()
+    {
         return 4;
     }
 }

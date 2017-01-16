@@ -7,9 +7,8 @@
 namespace Calcinai\PHPi\Pin\EdgeDetector;
 
 use Calcinai\PHPi\Board;
-use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Peripheral\Register;
-
+use Calcinai\PHPi\Pin;
 use React\EventLoop\Timer\TimerInterface;
 
 /**
@@ -25,7 +24,8 @@ use React\EventLoop\Timer\TimerInterface;
  * Class StatusPoll
  * @package Calcinai\PHPi\Pin
  */
-class StatusPoll implements EdgeDetectorInterface {
+class StatusPoll implements EdgeDetectorInterface
+{
 
     /**
      * Should be low enough load to check the registers 100Hz
@@ -59,14 +59,16 @@ class StatusPoll implements EdgeDetectorInterface {
 
     private $poll_interval;
 
-    public function __construct(Board $board) {
+    public function __construct(Board $board)
+    {
         $this->board = $board;
         $this->pins = [];
         $this->gpio_register = $board->getGPIORegister();
         $this->poll_interval = self::DEFAULT_POLL_INTERVAL;
     }
 
-    public function addPin(Pin $pin){
+    public function addPin(Pin $pin)
+    {
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($bank, $mask, $shift) = $pin->getAddressMask();
         $this->pins[$bank][$shift] = $pin;
@@ -74,7 +76,8 @@ class StatusPoll implements EdgeDetectorInterface {
         $this->updateDetectRegisters();
     }
 
-    public function removePin(Pin $pin){
+    public function removePin(Pin $pin)
+    {
         /** @noinspection PhpUnusedLocalVariableInspection */
         list($bank, $mask, $shift) = $pin->getAddressMask();
         unset($this->pins[$bank][$shift]);
@@ -85,29 +88,30 @@ class StatusPoll implements EdgeDetectorInterface {
     /**
      * Update the detect registers and start/stop the polling if necessary.
      */
-    private function updateDetectRegisters(){
+    private function updateDetectRegisters()
+    {
 
         //Initialise the banks with nothing set
         //Is this a problem? Could something else be depending on them being set in another process?
         $banks_watching = [0, 0];
 
-        foreach($this->pins as $bank => $bank_pins){
-            foreach($bank_pins as $bit_position => $pin){
+        foreach ($this->pins as $bank => $bank_pins) {
+            foreach ($bank_pins as $bit_position => $pin) {
                 $banks_watching[$bank] |= 1 << $bit_position;
             }
         }
 
         ///Set rising and falling - irrelevant events will be ignored.
-        foreach($banks_watching as $index => $bank) {
+        foreach ($banks_watching as $index => $bank) {
             $this->gpio_register[Register\GPIO::$GPREN[$index]] = $bank;
             $this->gpio_register[Register\GPIO::$GPFEN[$index]] = $bank;
         }
 
         //Stop or start the timer if necessary.
         //array sum checking if any bits in either bank are set
-        if(array_sum($banks_watching) === 0){
+        if (array_sum($banks_watching) === 0) {
             $this->stop();
-        } elseif(!$this->isActive()){
+        } elseif (!$this->isActive()) {
             $this->start();
         }
 
@@ -118,20 +122,21 @@ class StatusPoll implements EdgeDetectorInterface {
      *
      * @return bool
      */
-    public function checkStatusRegisters(){
+    public function checkStatusRegisters()
+    {
 
-        foreach(Register\GPIO::$GPEDS as $bank => $address){
+        foreach (Register\GPIO::$GPEDS as $bank => $address) {
             $bank_event_bits = $this->gpio_register[$address];
 
-            if($bank_event_bits === 0){
+            if ($bank_event_bits === 0) {
                 continue;
             }
 
             //This used to be a one-liner.  Decided to stop being clever for clarity.
-            for($bit_position = 0; $shifted = $bank_event_bits >> $bit_position; $bit_position++){
+            for ($bit_position = 0; $shifted = $bank_event_bits >> $bit_position; $bit_position++) {
                 //The $bit_position bit is set
-                if($shifted & 1){
-                    if(isset($this->pins[$bank][$bit_position])){
+                if ($shifted & 1) {
+                    if (isset($this->pins[$bank][$bit_position])) {
                         //This is a bit of a double operation here, but really the best that can be done.
                         /** @var Pin $pin */
                         $pin = $this->pins[$bank][$bit_position];
@@ -154,21 +159,23 @@ class StatusPoll implements EdgeDetectorInterface {
     }
 
 
-
-    public function isActive(){
+    public function isActive()
+    {
         return $this->timer !== null;
     }
 
-    private function start(){
+    private function start()
+    {
 
-        if($this->isActive()){
+        if ($this->isActive()) {
             $this->stop();
         }
 
         $this->timer = $this->board->getLoop()->addPeriodicTimer($this->poll_interval, [$this, 'checkStatusRegisters']);
     }
 
-    private function stop(){
+    private function stop()
+    {
         $this->timer->cancel();
         $this->timer = null;
     }

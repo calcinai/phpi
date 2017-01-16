@@ -9,9 +9,12 @@ namespace Calcinai\PHPi\Board;
 
 use React\EventLoop\LoopInterface;
 
-interface BoardInterface {
+interface BoardInterface
+{
     public static function getPeripheralBaseAddress();
+
     public static function getPinFunctionMatrix();
+
     public static function getBoardName();
 
     /**

@@ -9,7 +9,8 @@ namespace Calcinai\PHPi\Peripheral;
 
 use Calcinai\PHPi\Board;
 
-class AbstractPeripheral {
+class AbstractPeripheral
+{
 
     /**
      * @var Board
@@ -19,7 +20,8 @@ class AbstractPeripheral {
     /**
      * @return Board
      */
-    public function getBoard(){
+    public function getBoard()
+    {
         return $this->board;
     }
 

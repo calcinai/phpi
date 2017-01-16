@@ -7,25 +7,26 @@
 
 namespace Calcinai\PHPi\Pin;
 
-class PinFunction {
+class PinFunction
+{
 
     /**
      * Binary function selectors.  Each pin has 3 bits.  4 registers total.
      */
-    const INPUT    = 0b000;
-    const OUTPUT   = 0b001;
-    const ALT0     = 0b100;
-    const ALT1     = 0b101;
-    const ALT2     = 0b110;
-    const ALT3     = 0b111;
-    const ALT4     = 0b011;
-    const ALT5     = 0b010;
+    const INPUT  = 0b000;
+    const OUTPUT = 0b001;
+    const ALT0   = 0b100;
+    const ALT1   = 0b101;
+    const ALT2   = 0b110;
+    const ALT3   = 0b111;
+    const ALT4   = 0b011;
+    const ALT5   = 0b010;
 
 
     /**
      * Named alternative functions - these are used in the board function matrices
      */
-    
+
     /** BSC master 0 data line */
     const SDA0 = 'SDA0';
 

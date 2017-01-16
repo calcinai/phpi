@@ -16,13 +16,14 @@ use Calcinai\PHPi\Board;
  * Class SPI
  * @package Calcinai\PHPi\Peripheral
  */
-class SPI extends AbstractPeripheral {
+class SPI extends AbstractPeripheral
+{
 
     const SPI0 = 0;
 
-    const CS0 = 0; //Chip Select 0
-    const CS1 = 1; //Chip Select 1
-    const CS2 = 2; //Chip Select 2 (ie pins CS1 and CS2 are asserted)
+    const CS0     = 0; //Chip Select 0
+    const CS1     = 1; //Chip Select 1
+    const CS2     = 2; //Chip Select 2 (ie pins CS1 and CS2 are asserted)
     const CS_NONE = 3; // CS, control it yourself
 
 
@@ -36,7 +37,8 @@ class SPI extends AbstractPeripheral {
     private $spi_register;
 
 
-    public function __construct(Board $board, $spi_number) {
+    public function __construct(Board $board, $spi_number)
+    {
 
         $this->board = $board;
         $this->spi_number = $spi_number;
@@ -47,8 +49,9 @@ class SPI extends AbstractPeripheral {
      * @param $frequency
      * @return $this
      */
-    public function setClockSpeed($frequency){
-        $divisor =  self::SYSTEM_CLOCK_SPEED / $frequency;
+    public function setClockSpeed($frequency)
+    {
+        $divisor = self::SYSTEM_CLOCK_SPEED / $frequency;
 
         $this->spi_register[Register\SPI::CLK] = round($divisor);
 
@@ -63,7 +66,8 @@ class SPI extends AbstractPeripheral {
      * @param $cex
      * @return $this
      */
-    public function chipSelect($cex) {
+    public function chipSelect($cex)
+    {
         $this->spi_register[Register\SPI::CS] = Register\SPI::CS_CS & $cex;
 
         return $this;
@@ -81,9 +85,10 @@ class SPI extends AbstractPeripheral {
      * @param int $cex
      * @return mixed
      */
-    public function transfer($tx_buffer, $cex = null){
+    public function transfer($tx_buffer, $cex = null)
+    {
 
-        if($cex !== null){
+        if ($cex !== null) {
             $this->chipSelect($cex);
         }
 
@@ -93,7 +98,7 @@ class SPI extends AbstractPeripheral {
         //Slow because of the shallow FIFO
         //Also need to pack and unpack so there's a sensible interface to send data
         $rx_buffer = '';
-        foreach(str_split($tx_buffer) as $char){
+        foreach (str_split($tx_buffer) as $char) {
             $rx_buffer .= $this->transferByte($char);
         }
 
@@ -108,17 +113,17 @@ class SPI extends AbstractPeripheral {
     }
 
 
-
-    private function transferByte($byte){
+    private function transferByte($byte)
+    {
 
         // Wait for cts
-        while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)){
+        while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_TXD)) {
             usleep(1);
         }
         $this->spi_register[Register\SPI::FIFO] = ord($byte); //Just in case (PHP)
 
         //Wait for FIFO to be populated
-        while(!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)){
+        while (!($this->spi_register[Register\SPI::CS] & Register\SPI::CS_RXD)) {
             usleep(1);
         }
 
@@ -127,12 +132,14 @@ class SPI extends AbstractPeripheral {
     }
 
 
-    private function startTransfer(){
+    private function startTransfer()
+    {
         //Clear TX and RX FIFO, set TA
         $this->spi_register[Register\SPI::CS] |= Register\SPI::CS_CLEAR | Register\SPI::CS_TA;
     }
 
-    private function endTransfer(){
+    private function endTransfer()
+    {
         //Clear TA
         $this->spi_register[Register\SPI::CS] &= ~Register\SPI::CS_TA;
     }
