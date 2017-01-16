@@ -32,20 +32,52 @@ class Button extends Input
     const DEFAULT_HOLD_PERIOD  = 1;
     const DEFAULT_PRESS_PERIOD = 0.05;
 
+    /**
+     * Period (in seconds) to ignore subsequent press events
+     */
+    const DEFAULT_DEBOUNCE_PERIOD = 0.25;
+
     const EVENT_PRESS   = 'press';
     const EVENT_HOLD    = 'hold';
     const EVENT_RELEASE = 'release';
+    /**
+     * @var float
+     */
+    private $debounce_period;
 
 
-    public function __construct(Pin $pin, $active_high = true, $press_period = self::DEFAULT_PRESS_PERIOD, $hold_period = self::DEFAULT_HOLD_PERIOD)
+    public function __construct(Pin $pin, $active_high = true,
+        $press_period = self::DEFAULT_PRESS_PERIOD,
+        $hold_period = self::DEFAULT_HOLD_PERIOD,
+        $debounce_period = self::DEFAULT_DEBOUNCE_PERIOD)
     {
         parent::__construct($pin);
 
         $this->press_period = $press_period;
         $this->hold_period = $hold_period;
         $this->active_high = $active_high;
+        $this->debounce_period = $debounce_period;
     }
 
+
+    /**
+     * Function to setup the listerner on pin change.  There is a 'once' listener because it needs to be removed and
+     * re-added for debounce.  This could also be changed to have some 'debouncing' flag etc.
+     */
+    private function registerPressEvent()
+    {
+        //Do it like this so it can be hidden from userspace
+        $press_event = $this->active_high ? Pin::EVENT_LEVEL_HIGH : Pin::EVENT_LEVEL_LOW;
+        $this->pin->once($press_event, function () {
+            $this->onPinPressEvent();
+
+            //Re-add the press event after the debounce period
+            $this->pin->getBoard()->getLoop()->addTimer($this->debounce_period, function () {
+                $this->registerPressEvent();
+            });
+        });
+
+    }
 
     /**
      *
@@ -82,11 +114,7 @@ class Button extends Input
             return;
         }
 
-        //Do it like this so it can be hidden from userspace
-        $press_event = $this->active_high ? Pin::EVENT_LEVEL_HIGH : Pin::EVENT_LEVEL_LOW;
-        $this->pin->on($press_event, function () {
-            $this->onPinPressEvent();
-        });
+        $this->registerPressEvent();
     }
 
 
