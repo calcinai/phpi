@@ -66,6 +66,8 @@ class Factory
                 return new Board\V1\APlus($loop);
             case 'a01040':
             case 'a01041':
+            case '1a01041': //Is this an overvoltage bit?
+            case '2a01041': //and this?
             case 'a21041':
             case 'a22042':
                 return new Board\V2\B($loop);

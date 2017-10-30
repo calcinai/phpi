@@ -64,6 +64,7 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess
     }
 
     /**
+     *
      * This is to facilitate registers that have a way of direct (unprivileged) access, eg the /dev/gpiomem
      *
      * @return null
