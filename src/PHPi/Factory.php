@@ -78,6 +78,7 @@ class Factory
                 return new Board\ZeroW($loop);
             case 'a02082':
             case 'a22082':
+            case 'a32082':
                 return new Board\V3\B($loop);
         }
 
