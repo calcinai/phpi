@@ -54,7 +54,7 @@ $pin = $board->getPin(17) //BCM pin number
 //Will be === to Pin::LEVEL_HIGH or Pin::LEVEL_LOW
 var_dump($pin->level());
 
-$pin->setFunction(PinFunction::OUTPUT)
+$pin->setFunction(PinFunction::OUTPUT);
 $pin->high();
 $pin->low();
 ```
