@@ -36,6 +36,23 @@ trait EventEmitterTrait
 
         $this->on($event, $onceListener);
     }
+    
+    /**
+	 * Similar to on but with debounce
+	 * @param $event
+	 * @param callable $listener
+	 * @param float $debounce
+	 */
+	public function onDebounce($event, callable $listener,$debounce=0.5){
+		//Do it like this so it can be hidden from userspace
+		$this->once($event, function () use($event,$listener,$debounce) {
+			$listener();
+			//Re-add the press event after the debounce period
+			$this->getBoard()->getLoop()->addTimer($debounce, function () use($event,$listener){
+				$this->onDebounce($event,$listener);
+			});
+		});
+	}
 
     public function removeListener($event, callable $listener)
     {
