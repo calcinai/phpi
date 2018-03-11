@@ -46,15 +46,17 @@ $board = \Calcinai\PHPi\Factory::create();
 Minimal example of reading and setting a pin
 
 ```php
+use Calcinai\PHPi\Pin\PinFunction;
+use Calcinai\PHPi\Pin;
 
 $pin = $board->getPin(17) //BCM pin number
              ->setFunction(PinFunction::INPUT)
              ->setPull(Pin::PULL_UP);
 
 //Will be === to Pin::LEVEL_HIGH or Pin::LEVEL_LOW
-var_dump($pin->level());
+var_dump($pin->getLevel());
 
-$pin->setFunction(PinFunction::OUTPUT)
+$pin->setFunction(PinFunction::OUTPUT);
 $pin->high();
 $pin->low();
 ```
