@@ -120,7 +120,7 @@ class StatusPoll implements EdgeDetectorInterface
     /**
      * needs to be public so can be called from timer context
      *
-     * @return bool
+     * @throws \Calcinai\PHPi\Exception\InvalidPinFunctionException
      */
     public function checkStatusRegisters()
     {
@@ -155,7 +155,6 @@ class StatusPoll implements EdgeDetectorInterface
             //Set the clear bit for any that we will have dealt with
             $this->gpio_register[$address] = $bank_event_bits;
         }
-
     }
 
 

@@ -80,6 +80,8 @@ class Factory
             case 'a22082':
             case 'a32082':
                 return new Board\V3\B($loop);
+            case 'a020d3':
+                return new Board\V3\BPlus($loop);
         }
 
         throw new UnsupportedBoardException(sprintf('Board revision [%s/%s] is not (yet) supported.', $revision, $soc));

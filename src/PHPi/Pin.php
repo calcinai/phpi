@@ -61,14 +61,21 @@ class Pin
 
     /**
      * Internal level cache - this will only be the last known level, not actually updated until it changes.
+     * One of self::LEVEL_LOW|self::LEVEL_HIGH
      *
-     * @var null|self::LEVEL_LOW|self::LEVEL_HIGH
+     * @var null|int
      */
     private $internal_level;
 
 
     private $mask_cache = [];
 
+    /**
+     * Pin constructor.
+     * @param Board $board
+     * @param $pin_number
+     * @throws InvalidPinFunctionException
+     */
     public function __construct(Board $board, $pin_number)
     {
         $this->board = $board;

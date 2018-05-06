@@ -27,6 +27,7 @@ abstract class AbstractRegister implements RegisterInterface, \ArrayAccess
      * AbstractRegister constructor.
      * @param BoardInterface $board
      * @throws InternalFailureException
+     * @throws \ReflectionException
      */
     public function __construct(BoardInterface $board)
     {
