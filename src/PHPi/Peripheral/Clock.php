@@ -18,6 +18,8 @@ class Clock extends AbstractPeripheral
     private $div;
     private $ctl;
 
+    private $source;
+
     const MIN_FREQUENCY = 0.0001;
 
     const GP0 = 0;
@@ -51,34 +53,59 @@ class Clock extends AbstractPeripheral
         Register\Clock::SRC_HDMI => 216e6, //216MHz
     ];
 
-    public function __construct(Board $board, $clock_number)
+    /**
+     * Clock constructor.
+     *
+     * @param Board $board
+     * @param $clock_number
+     * @param int $src
+     * @throws \Calcinai\PHPi\Exception\InternalFailureException
+     * @throws \ReflectionException
+     * @throws InvalidValueException
+     */
+    public function __construct(Board $board, $clock_number, $src = Register\Clock::SRC_OSC)
     {
         $this->board = $board;
         $this->clock_register = $this->board->getClockRegister();
 
         $this->div = static::$DIV[$clock_number];
         $this->ctl = static::$CTL[$clock_number];
+
+        $this->setSource($src);
     }
 
     /**
-     * @param $frequency
-     * @param int $src
-     * @return $this
+     * @param $src
      * @throws InvalidValueException
      */
-    public function start($frequency, $src = Register\Clock::SRC_OSC)
+    public function setSource($src)
     {
-
         if (!isset(static::$CLOCK_FREQUENCIES[$src])) {
             throw new InvalidValueException(sprintf('Invalid clock source'));
         }
 
-        $base_frequency = static::$CLOCK_FREQUENCIES[$src];
+        $this->source = $src;
+        $this->clock_register[$this->ctl] |= Register\AbstractRegister::BCM_PASSWORD | $src;
+        usleep(10);
+    }
+
+    /**
+     * @param $frequency
+     * @throws InvalidValueException
+     */
+    public function setFrequency($frequency)
+    {
+        $was_running = $this->isRunning();
+
+        if ($was_running) {
+            $this->stop();
+        }
+
+        $base_frequency = static::$CLOCK_FREQUENCIES[$this->source];
 
         if ($frequency < self::MIN_FREQUENCY || $frequency > $base_frequency) {
             throw new InvalidValueException(sprintf('Frequency must be between %s and %s', self::MIN_FREQUENCY, $base_frequency));
         }
-
 
         $divi = $base_frequency / $frequency;
         $divr = $base_frequency % $frequency;
@@ -89,10 +116,17 @@ class Clock extends AbstractPeripheral
         $this->clock_register[$this->div] = Register\AbstractRegister::BCM_PASSWORD | ($divi << 12) | $divf;
         usleep(10);
 
-        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | $src;
-        usleep(10);
+        if ($was_running) {
+            $this->start();
+        }
+    }
 
-        $this->clock_register[$this->ctl] |= Register\Clock::ENAB;
+    /**
+     * @return $this
+     */
+    public function start()
+    {
+        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::ENAB;
 
         return $this;
     }
@@ -102,16 +136,20 @@ class Clock extends AbstractPeripheral
      */
     public function stop()
     {
-
-        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::KILL;
+        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | 0x01;
         usleep(110);
 
         //Wait for not busy
         while (($this->clock_register[$this->ctl] & Register\Clock::BUSY) != 0) {
-            usleep(10);
+            usleep(1);
         }
 
         return $this;
+    }
+
+    public function isRunning()
+    {
+        return !!$this->clock_register[$this->ctl] & Register\Clock::ENAB;
     }
 
 }

@@ -7,8 +7,6 @@
 
 namespace Calcinai\PHPi\Peripheral\Register;
 
-use Calcinai\PHPi\Pin;
-
 class GPIO extends AbstractRegister
 {
 

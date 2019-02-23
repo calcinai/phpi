@@ -21,6 +21,9 @@ class PWM extends AbstractPeripheral
     const PWM1 = 1;
 
 
+    private $is_active;
+
+
     private $pwm_register;
 
     /**
@@ -30,29 +33,16 @@ class PWM extends AbstractPeripheral
      */
     private $pwm_number;
 
+
     /**
-     * Duty cycle
+     * PWM constructor.
      *
-     * @var int
+     * @param Board $board
+     * @param $pwm_number
+     * @throws InvalidValueException
+     * @throws \Calcinai\PHPi\Exception\InternalFailureException
+     * @throws \ReflectionException
      */
-    private $duty_cycle;
-
-    /**
-     * @var int
-     */
-    private $frequency;
-
-    /**
-     * The PWM range register.
-     *
-     * @var int
-     */
-    private $range;
-
-
-    private $enable_ms;
-
-
     public function __construct(Board $board, $pwm_number)
     {
 
@@ -61,16 +51,15 @@ class PWM extends AbstractPeripheral
         $this->pwm_number = $pwm_number;
 
         $this->is_active = false;
-        $this->frequency = self::DEFAULT_FREQUENCY;
 
+        $this->setFrequency(self::DEFAULT_FREQUENCY);
         $this->setDutyCycle(self::DEFAULT_DUTY_CYCLE);
         $this->setRange(self::DEFAULT_RANGE);
         $this->setEnableMS(false);
-
     }
 
     /**
-     * Duty cucle as a percentage
+     * Duty cycle as a percentage
      *
      * @param $duty
      * @return $this
@@ -78,13 +67,12 @@ class PWM extends AbstractPeripheral
      */
     public function setDutyCycle($duty)
     {
-
         if ($duty < 0 || $duty > 100) {
             throw new InvalidValueException('Duty cycle must be between 0 and 100%');
         }
 
-        $this->duty_cycle = $duty;
-        $this->pwm_register[Register\PWM::$DAT[$this->pwm_number]] = $this->duty_cycle / 100 * $this->range;
+        $range = $this->pwm_register[Register\PWM::$RNG[$this->pwm_number]];
+        $this->pwm_register[Register\PWM::$DAT[$this->pwm_number]] = $duty / 100 * $range;
         usleep(10);
 
         return $this;
@@ -96,9 +84,7 @@ class PWM extends AbstractPeripheral
      */
     public function setRange($range)
     {
-
-        $this->range = $range;
-        $this->pwm_register[Register\PWM::$RNG[$this->pwm_number]] = $this->range;
+        $this->pwm_register[Register\PWM::$RNG[$this->pwm_number]] = $range;
         usleep(10);
 
         return $this;
@@ -111,9 +97,7 @@ class PWM extends AbstractPeripheral
      */
     public function setEnableMS($enable_ms)
     {
-
-        $this->enable_ms = $enable_ms;
-        if ($this->enable_ms) {
+        if ($enable_ms) {
             $this->pwm_register[Register\PWM::CTL] |= Register\PWM::$MSEN[$this->pwm_number];
         } else {
             $this->pwm_register[Register\PWM::CTL] &= ~Register\PWM::$MSEN[$this->pwm_number];
@@ -134,9 +118,15 @@ class PWM extends AbstractPeripheral
      */
     public function setFrequency($frequency)
     {
+        $current_control_reg = $this->pwm_register[Register\PWM::CTL];
+        // Make sure both disabled
+        $this->pwm_register[Register\PWM::CTL] = $current_control_reg & ~(Register\PWM::PWEN1 | Register\PWM::PWEN2);
 
-        $this->frequency = $frequency;
-        $this->restart();
+        //Change clock frequency
+        $this->board->getClock(Clock::PWM)->setFrequency($frequency);
+
+        //Restore them to where they were
+        $this->pwm_register[Register\PWM::CTL] = $current_control_reg;
 
         return $this;
     }
@@ -151,18 +141,9 @@ class PWM extends AbstractPeripheral
      */
     public function start()
     {
+        $this->board->getClock(Clock::PWM)->start();
 
-        //Backup states
-        $current_control_reg = $this->pwm_register[Register\PWM::CTL];
-        $enable_state = $current_control_reg & (Register\PWM::PWEN1 | Register\PWM::PWEN2);
-
-        //Make sure both disabled
-        $this->pwm_register[Register\PWM::CTL] = $current_control_reg & ~(Register\PWM::PWEN1 | Register\PWM::PWEN2);
-
-        $this->board->getClock(Clock::PWM)->stop()->start($this->frequency);
-
-        //Restore settings
-        $this->pwm_register[Register\PWM::CTL] = $enable_state | Register\PWM::$PWEN[$this->pwm_number];
+        $this->pwm_register[Register\PWM::CTL] |= Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }
@@ -174,12 +155,16 @@ class PWM extends AbstractPeripheral
      */
     public function stop()
     {
-
         $this->pwm_register[Register\PWM::CTL] &= ~Register\PWM::$PWEN[$this->pwm_number];
 
         return $this;
     }
 
+
+    /**
+     * @return PWM
+     * @throws InvalidValueException
+     */
     public function restart()
     {
         return $this->stop()->start();

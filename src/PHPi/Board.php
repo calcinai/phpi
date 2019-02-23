@@ -13,7 +13,6 @@ use Calcinai\PHPi\Peripheral\I2C;
 use Calcinai\PHPi\Peripheral\PWM;
 use Calcinai\PHPi\Peripheral\Register;
 use Calcinai\PHPi\Peripheral\SPI;
-use Calcinai\PHPi\Pin;
 use Calcinai\PHPi\Pin\EdgeDetector;
 use React\EventLoop\LoopInterface;
 
@@ -101,6 +100,7 @@ abstract class Board implements BoardInterface
     /**
      * @param $pin_number
      * @return Pin
+     * @throws Exception\InvalidPinFunctionException
      */
     public function getPin($pin_number)
     {
@@ -115,6 +115,7 @@ abstract class Board implements BoardInterface
     /**
      * @param $pwm_number
      * @return PWM
+     * @throws Exception\InvalidValueException
      */
     public function getPWM($pwm_number)
     {
@@ -154,6 +155,7 @@ abstract class Board implements BoardInterface
     /**
      * @param $i2c_number
      * @return SPI
+     * @throws \Exception
      */
     public function getI2C($i2c_number)
     {
@@ -166,6 +168,8 @@ abstract class Board implements BoardInterface
 
     /**
      * @return Register\GPIO
+     * @throws Exception\InternalFailureException
+     * @throws \ReflectionException
      */
     public function getGPIORegister()
     {
@@ -178,6 +182,8 @@ abstract class Board implements BoardInterface
 
     /**
      * @return Register\PWM
+     * @throws Exception\InternalFailureException
+     * @throws \ReflectionException
      */
     public function getPWMRegister()
     {
@@ -190,6 +196,8 @@ abstract class Board implements BoardInterface
 
     /**
      * @return Register\Clock
+     * @throws Exception\InternalFailureException
+     * @throws \ReflectionException
      */
     public function getClockRegister()
     {
@@ -202,6 +210,8 @@ abstract class Board implements BoardInterface
 
     /**
      * @return Register\Auxiliary
+     * @throws Exception\InternalFailureException
+     * @throws \ReflectionException
      */
     public function getAuxRegister()
     {
@@ -214,6 +224,8 @@ abstract class Board implements BoardInterface
 
     /**
      * @return Register\SPI
+     * @throws Exception\InternalFailureException
+     * @throws \ReflectionException
      */
     public function getSPIRegister()
     {
