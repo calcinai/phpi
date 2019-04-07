@@ -9,6 +9,7 @@ namespace Calcinai\PHPi\Peripheral;
 
 use Calcinai\PHPi\Board;
 use Calcinai\PHPi\Exception\InvalidValueException;
+use Calcinai\PHPi\Peripheral\Register\AbstractRegister;
 
 class Clock extends AbstractPeripheral
 {
@@ -111,8 +112,6 @@ class Clock extends AbstractPeripheral
         $divr = $base_frequency % $frequency;
         $divf = ($divr * (1 << 12) / $base_frequency);
 
-        $divi = min($divi, 4095);
-
         $this->clock_register[$this->div] = Register\AbstractRegister::BCM_PASSWORD | ($divi << 12) | $divf;
         usleep(10);
 
@@ -126,7 +125,7 @@ class Clock extends AbstractPeripheral
      */
     public function start()
     {
-        $this->clock_register[$this->ctl] = Register\AbstractRegister::BCM_PASSWORD | Register\Clock::ENAB;
+        $this->clock_register[$this->ctl] |= Register\AbstractRegister::BCM_PASSWORD | Register\Clock::ENAB;
 
         return $this;
     }
